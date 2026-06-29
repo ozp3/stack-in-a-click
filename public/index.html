@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stack-in-a-Click — Hermes Agent</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --card: #131320;
+    --border: #1e1e35;
+    --accent: #635bff;
+    --accent-glow: #8b83ff;
+    --green: #00d4aa;
+    --text: #e4e4f0;
+    --dim: #6b6b80;
+    --radius: 12px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .container { max-width: 640px; width: 100%; }
+
+  /* Header */
+  .header { text-align: center; margin-bottom: 32px; }
+  .header .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--accent), #4cc9f0);
+    color: #fff;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+  .header h1 span { background: linear-gradient(135deg, var(--accent), #4cc9f0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .header p { color: var(--dim); font-size: 14px; margin-top: 6px; }
+
+  /* Card */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .card h3 { font-size: 14px; font-weight: 600; margin-bottom: 16px; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; }
+
+  /* Service items */
+  .service-list { display: flex; flex-direction: column; gap: 10px; }
+  .service {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .service:hover { border-color: var(--accent); background: rgba(99,91,255,0.05); }
+  .service.selected { border-color: var(--accent); background: rgba(99,91,255,0.08); box-shadow: 0 0 20px rgba(99,91,255,0.1); }
+  .service .icon { font-size: 22px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); border-radius: 8px; }
+  .service .info { flex: 1; }
+  .service .info .name { font-weight: 600; font-size: 15px; }
+  .service .info .desc { font-size: 12px; color: var(--dim); margin-top: 2px; }
+  .service .tier {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: 500;
+  }
+  .tier.free { background: rgba(0,212,170,0.12); color: var(--green); }
+  .tier.payg { background: rgba(255,255,255,0.06); color: var(--dim); }
+
+  /* Button */
+  .btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--accent), #7c3aed);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 30px rgba(99,91,255,0.3); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* Status */
+  .status {
+    text-align: center;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 12px;
+    font-size: 13px;
+    display: none;
+  }
+  .status.show { display: block; }
+  .status.loading { background: rgba(99,91,255,0.1); color: var(--accent-glow); }
+  .status.success { background: rgba(0,212,170,0.1); color: var(--green); }
+  .status.error { background: rgba(255,77,77,0.1); color: #ff4d4d; }
+
+  /* Spinner */
+  .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid transparent; border-top-color: currentColor; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 8px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Env output */
+  .env-output {
+    background: #0a0a12;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 12px;
+    color: var(--green);
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 8px;
+    display: none;
+  }
+  .env-output.show { display: block; }
+
+  .copy-btn {
+    margin-top: 8px;
+    padding: 6px 14px;
+    background: var(--border);
+    border: none;
+    color: var(--text);
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .copy-btn:hover { background: var(--accent); }
+
+  /* Result list */
+  .result-list { margin-top: 12px; }
+  .result-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 14px; }
+  .result-item .check { color: var(--green); font-weight: bold; }
+  .result-item .fail { color: #ff4d4d; font-weight: bold; }
+
+  /* Footer */
+  .footer { text-align: center; margin-top: 20px; font-size: 11px; color: var(--dim); }
+  .footer a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="badge">Hermes Agent + Stripe Projects</div>
+    <h1>Stack-<span>in-a-Click</span></h1>
+    <p>Tek tıkla SaaS altyapını kur, .env olarak teslim al.</p>
+  </div>
+
+  <div class="card" id="services-card">
+    <h3>🛠️ Hangi servislere ihtiyacın var?</h3>
+    <div class="service-list" id="service-list">
+      <!-- filled by JS -->
+    </div>
+    <button class="btn" id="provision-btn" onclick="provision()">
+      🚀 Provision Seçili Servisler
+    </button>
+    <div class="status" id="status"></div>
+  </div>
+
+  <div class="card" id="results-card" style="display:none">
+    <h3>📦 Sonuç</h3>
+    <div class="result-list" id="result-list"></div>
+    <div class="env-output" id="env-output"></div>
+    <button class="copy-btn" id="copy-btn" style="display:none" onclick="copyEnv()">📋 .env'i Kopyala</button>
+  </div>
+
+  <div class="footer">
+    Built with <a href="https://hermes-agent.nousresearch.com" target="_blank">Hermes Agent</a> ·
+    <a href="https://stripe.com" target="_blank">Stripe</a> ·
+    <a href="https://nvidia.com" target="_blank">NVIDIA</a> ·
+    Hackathon 2026
+  </div>
+</div>
+
+<script>
+const API = window.location.origin;
+
+let services = {};
+
+async function loadServices() {
+  try {
+    const res = await fetch(`${API}/api/services`);
+    const data = await res.json();
+    services = data.services;
+    renderServices();
+  } catch (e) {
+    document.getElementById('service-list').innerHTML =
+      '<div style="color:#ff4d4d">Servisler yüklenemedi: API çalışmıyor olabilir.</div>';
+  }
+}
+
+function renderServices() {
+  const list = document.getElementById('service-list');
+  list.innerHTML = Object.entries(services).map(([key, svc]) => `
+    <div class="service" data-provider="${key}" onclick="toggleService(this, '${key}')">
+      <div class="icon">${svc.icon}</div>
+      <div class="info">
+        <div class="name">${svc.name}</div>
+        <div class="desc">${svc.desc}</div>
+      </div>
+      <div class="tier ${svc.tier}">${svc.tier === 'free' ? 'Ücretsiz' : 'Kullandıkça'}</div>
+    </div>
+  `).join('');
+}
+
+function toggleService(el, provider) {
+  el.classList.toggle('selected');
+}
+
+function getSelected() {
+  return [...document.querySelectorAll('.service.selected')].map(el => el.dataset.provider);
+}
+
+async function provision() {
+  const selected = getSelected();
+  if (selected.length === 0) {
+    showStatus('En az bir servis seçmelisin!', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('provision-btn');
+  const status = document.getElementById('status');
+
+  btn.disabled = true;
+  showStatus('<span class="spinner"></span>Servisler kuruluyor, Stripe üzerinden provision ediliyor...', 'loading');
+
+  try {
+    const res = await fetch(`${API}/api/provision`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ providers: selected }),
+    });
+    const data = await res.json();
+
+    // Show results
+    document.getElementById('results-card').style.display = 'block';
+    const resultList = document.getElementById('result-list');
+    resultList.innerHTML = '';
+
+    data.provisioned.forEach(r => {
+      resultList.innerHTML += `<div class="result-item"><span class="check">✓</span> ${r.icon} ${r.name}</div>`;
+    });
+    data.errors.forEach(r => {
+      resultList.innerHTML += `<div class="result-item"><span class="fail">✗</span> ${r.icon} ${r.name}: ${r.error}</div>`;
+    });
+
+    // Show .env
+    const envDiv = document.getElementById('env-output');
+    const copyBtn = document.getElementById('copy-btn');
+    if (data.env && data.env.trim()) {
+      envDiv.textContent = data.env;
+      envDiv.classList.add('show');
+      copyBtn.style.display = 'inline-block';
+    }
+
+    showStatus(data.message, data.success ? 'success' : 'error');
+    document.querySelectorAll('.service.selected').forEach(el => el.classList.remove('selected'));
+
+  } catch (e) {
+    showStatus('Bağlantı hatası: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function showStatus(msg, type) {
+  const s = document.getElementById('status');
+  s.innerHTML = msg;
+  s.className = 'status show ' + type;
+}
+
+function copyEnv() {
+  const env = document.getElementById('env-output').textContent;
+  navigator.clipboard.writeText(env).then(() => {
+    showStatus('✅ .env panoya kopyalandı!', 'success');
+  });
+}
+
+loadServices();
+</script>
+</body>
+</html>
