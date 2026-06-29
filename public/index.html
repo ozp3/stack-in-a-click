@@ -5,342 +5,330 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stack-in-a-Click — Hermes Agent</title>
 <style>
+  /* ── Design tokens ── */
   :root {
-    --bg: #f8f9fc; --card: #ffffff; --border: #e2e4eb;
-    --accent: #635bff; --accent-glow: #7c3aed; --green: #00a878;
-    --text: #1a1a2e; --dim: #8b8da0; --radius: 12px;
+    --bg:        #fafbfc;
+    --surface:   #ffffff;
+    --border:    #e4e8ee;
+    --text:      #1a1d26;
+    --dim:       #6f7585;
+    --accent:    #635bff;
+    --accent-hv: #5348e8;
+    --green:     #11996b;
+    --red:       #e54545;
+    --amber:     #e6a817;
+    --radius-sm: 8px;
+    --radius:    12px;
+    --radius-lg: 16px;
+    --shadow:    0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+    --shadow-lg: 0 4px 16px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04);
   }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
   body {
     background: var(--bg); color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-    min-height: 100vh; padding: 20px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+    min-height:100vh; padding: 32px 16px;
   }
-  .container { max-width: 720px; margin: 0 auto; }
+  .container { max-width: 780px; margin: 0 auto; }
 
-  /* Header */
-  .header { text-align: center; margin-bottom: 24px; }
-  .header .badge {
-    display: inline-block; background: linear-gradient(135deg, var(--accent), #4cc9f0);
-    color: #fff; padding: 4px 14px; border-radius: 20px; font-size: 12px;
-    font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 12px;
+  /* ── Header ── */
+  .hero { text-align:center; margin-bottom:28px; }
+  .hero .tag {
+    display:inline-flex; align-items:center; gap:6px;
+    background: linear-gradient(135deg, rgba(99,91,255,0.08), rgba(76,201,240,0.08));
+    border: 1px solid rgba(99,91,255,0.15); padding: 5px 16px; border-radius: 24px;
+    font-size: 12px; font-weight: 600; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 14px;
   }
-  .header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
-  .header h1 span { background: linear-gradient(135deg, var(--accent), #4cc9f0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  .header p { color: var(--dim); font-size: 14px; margin-top: 4px; }
-  .header .meta { font-size: 11px; color: var(--dim); margin-top: 4px; }
+  .hero h1 { font-size: 34px; font-weight: 800; letter-spacing: -0.8px; line-height: 1.15; }
+  .hero h1 em { font-style: normal; background: linear-gradient(135deg, var(--accent) 0%, #4cc9f0 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .hero p { color: var(--dim); font-size: 15px; margin-top: 6px; }
+  .hero .stats { font-size: 12px; color: var(--dim); margin-top: 6px; }
 
-  /* Search */
-  .search-box {
-    width: 100%; padding: 12px 16px; border: 1px solid var(--border);
-    border-radius: 10px; font-size: 14px; outline: none; background: var(--card);
-    color: var(--text); margin-bottom: 12px;
+  /* ── Search ── */
+  .search-wrap { position:relative; margin-bottom: 16px; }
+  .search-wrap input {
+    width: 100%; padding: 14px 18px 14px 44px; border: 1.5px solid var(--border);
+    border-radius: var(--radius); font-size: 15px; outline: none; background: var(--surface);
+    color: var(--text); transition: all 0.2s;
   }
-  .search-box:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99,91,255,0.1); }
+  .search-wrap input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(99,91,255,0.07); }
+  .search-wrap .s-icon { position:absolute; left:16px; top:50%; transform:translateY(-50%); color: var(--dim); font-size: 15px; pointer-events:none; }
+  .search-wrap .s-clear { position:absolute; right:14px; top:50%; transform:translateY(-50%); font-size: 18px; color: var(--dim); cursor:pointer; display:none; user-select:none; }
+  .search-wrap .s-clear.show { display:block; }
 
-  /* Templates */
-  .templates { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
-  .tpl-chip {
-    padding: 8px 14px; border: 1px solid var(--border); border-radius: 20px;
-    font-size: 13px; cursor: pointer; background: var(--card); color: var(--text);
-    transition: all 0.2s; user-select: none; white-space: nowrap;
+  /* ── Templates ── */
+  .tpl-section { margin-bottom: 18px; }
+  .tpl-section .label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--dim); margin-bottom: 10px; }
+  .tpl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 10px; }
+  .tpl-card {
+    background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius);
+    padding: 16px; cursor: pointer; transition: all 0.2s; user-select: none; position: relative;
   }
-  .tpl-chip:hover { border-color: var(--accent); background: rgba(99,91,255,0.04); }
-  .tpl-chip.active { border-color: var(--accent); background: rgba(99,91,255,0.08); color: var(--accent); font-weight: 600; }
+  .tpl-card:hover { border-color: var(--accent); box-shadow: var(--shadow-lg); transform: translateY(-1px); }
+  .tpl-card.active { border-color: var(--accent); background: rgba(99,91,255,0.03); }
+  .tpl-card.active::after { content:'✓'; position:absolute; right:12px; top:12px; color: var(--accent); font-weight:700; font-size:13px; }
+  .tpl-card .t-name { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+  .tpl-card .t-desc { font-size: 12px; color: var(--dim); line-height: 1.45; }
 
-  /* Card */
+  /* ── Services accordion ── */
   .card {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 20px; margin-bottom: 16px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow);
   }
-
-  /* Category */
+  .cat { border-bottom: 1px solid var(--border); }
+  .cat:last-child { border-bottom: none; }
   .cat-header {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 10px 0; cursor: pointer; user-select: none;
-    border-bottom: 1px solid transparent;
+    padding: 15px 20px; cursor: pointer; user-select: none; transition: background 0.15s;
   }
-  .cat-header:hover { color: var(--accent); }
-  .cat-header .left { display: flex; align-items: center; gap: 10px; }
-  .cat-header .icon { font-size: 20px; }
-  .cat-header .name { font-weight: 600; font-size: 14px; }
-  .cat-header .count { font-size: 12px; color: var(--dim); margin-left: 4px; }
-  .cat-header .arrow { font-size: 12px; color: var(--dim); transition: transform 0.2s; }
-  .cat-header.open .arrow { transform: rotate(180deg); }
-  .cat-header.open { border-bottom-color: var(--border); }
-
-  .cat-body { display: none; padding: 8px 0; }
+  .cat-header:hover { background: rgba(99,91,255,0.02); }
+  .cat-header .c-left { display: flex; align-items: center; gap: 11px; }
+  .cat-header .c-icon { font-size: 19px; opacity: 0.85; }
+  .cat-header .c-name { font-weight: 700; font-size: 14px; }
+  .cat-header .c-badge {
+    font-size: 11px; background: rgba(99,91,255,0.06); color: var(--accent);
+    padding: 2px 8px; border-radius: 10px; font-weight: 600;
+  }
+  .cat-header .c-arrow { font-size: 11px; color: var(--dim); transition: transform 0.2s; }
+  .cat-header.open .c-arrow { transform: rotate(180deg); }
+  .cat-body { display: none; padding: 0 20px 14px; }
   .cat-body.show { display: block; }
 
-  /* Service */
-  .service {
-    display: flex; align-items: center; gap: 10px; padding: 10px 12px;
-    border-radius: 8px; cursor: pointer; transition: all 0.15s; user-select: none;
+  .svc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px,1fr)); gap: 6px; }
+  .svc {
+    display: flex; align-items: flex-start; gap: 8px; padding: 10px 12px;
+    border-radius: var(--radius-sm); cursor: pointer; transition: all 0.15s; user-select: none;
+    border: 1.5px solid transparent;
   }
-  .service:hover { background: rgba(99,91,255,0.03); }
-  .service.selected { background: rgba(99,91,255,0.06); border: 1px solid var(--accent); padding: 9px 11px; }
-  .service .s-name { font-weight: 500; font-size: 14px; flex: 1; }
-  .service .s-desc { font-size: 12px; color: var(--dim); }
-  .service .s-info { flex: 1; }
-  .service .tier { font-size: 10px; padding: 2px 8px; border-radius: 5px; font-weight: 500; }
-  .tier.free { background: rgba(0,168,120,0.1); color: var(--green); }
-  .tier.mixed { background: rgba(99,91,255,0.08); color: var(--accent); }
-  .tier.paid { background: #fef2f2; color: #dc2626; }
+  .svc:hover { background: rgba(99,91,255,0.02); }
+  .svc.selected { background: rgba(99,91,255,0.04); border-color: var(--accent); }
+  .svc .s-info { flex:1; min-width:0; }
+  .svc .s-name { font-weight: 600; font-size: 13px; }
+  .svc .s-desc { font-size: 11px; color: var(--dim); line-height: 1.35; margin-top: 1px; }
+  .svc .s-tier {
+    font-size: 9px; padding: 2px 7px; border-radius: 5px; font-weight: 700; text-transform: uppercase; letter-spacing:0.3px; white-space:nowrap;
+  }
+  .tier-free   { background: rgba(17,153,107,0.08); color: var(--green); }
+  .tier-mixed  { background: rgba(99,91,255,0.07); color: var(--accent); }
+  .tier-paid   { background: rgba(229,69,69,0.07); color: var(--red); }
 
-  /* Button */
+  /* ── Action bar ── */
+  .action-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px; background: var(--surface); border-top: 1px solid var(--border);
+    border-radius: 0 0 var(--radius) var(--radius); margin-top: -1px;
+  }
   .btn {
-    width: 100%; padding: 14px; background: linear-gradient(135deg, var(--accent), #7c3aed);
-    color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: 600;
-    cursor: pointer; transition: all 0.2s; letter-spacing: 0.3px;
+    padding: 12px 28px; background: linear-gradient(135deg, var(--accent), #7c3aed);
+    color: #fff; border: none; border-radius: var(--radius-sm); font-size: 14px;
+    font-weight: 700; cursor: pointer; transition: all 0.2s; letter-spacing: 0.2px;
   }
-  .btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 30px rgba(99,91,255,0.3); }
-  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(99,91,255,0.3); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(30%); }
+  .selection-count { font-size: 13px; color: var(--dim); }
+  .selection-count strong { color: var(--accent); }
 
-  /* Status */
+  /* ── Status / results ── */
   .status {
-    text-align: center; padding: 10px; border-radius: 8px; margin-top: 10px;
-    font-size: 13px; display: none;
+    text-align:center; padding: 12px; border-radius: var(--radius-sm); font-size:13px;
+    display:none; margin-top:12px;
   }
-  .status.show { display: block; }
-  .status.loading { background: rgba(99,91,255,0.08); color: var(--accent-glow); }
-  .status.success { background: rgba(0,168,120,0.08); color: var(--green); }
-  .status.error { background: rgba(255,77,77,0.08); color: #dc2626; }
+  .status.show { display:block; }
+  .status.loading { background: rgba(99,91,255,0.06); color: var(--accent); }
+  .status.success { background: rgba(0,168,120,0.06); color: var(--green); }
+  .status.error   { background: rgba(229,69,69,0.06); color: var(--red); }
+  .spinner { display:inline-block; width:14px; height:14px; border:2px solid transparent; border-top-color:currentColor; border-radius:50%; animation:spin 0.8s linear infinite; vertical-align:middle; margin-right:6px; }
+  @keyframes spin { to{transform:rotate(360deg)} }
 
-  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid transparent; border-top-color: currentColor; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 6px; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* Results */
-  .result-item { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 14px; }
-  .result-item .check { color: var(--green); font-weight: bold; }
-  .result-item .fail { color: #dc2626; font-weight: bold; }
-
-  .env-output { display: none; }
+  .results-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 20px; margin-top: 16px; box-shadow: var(--shadow); display: none;
+  }
+  .results-card.show { display: block; }
+  .results-card h4 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--dim); margin-bottom: 10px; }
+  .result-item { display:flex; align-items:center; gap:8px; padding:4px 0; font-size:14px; }
+  .ri-ok { color: var(--green); font-weight: 700; }
+  .ri-err { color: var(--red); font-weight: 700; }
   .copy-btn {
-    margin-top: 8px; padding: 8px 16px; background: var(--border); border: none;
-    color: var(--text); border-radius: 6px; font-size: 12px; cursor: pointer;
-    display: none;
+    margin-top:12px; padding:8px 18px; background: var(--border); border:none;
+    color: var(--text); border-radius: var(--radius-sm); font-size:12px; font-weight:600;
+    cursor:pointer; display:none;
   }
   .copy-btn:hover { background: var(--accent); color: #fff; }
 
-  .summary-bar {
-    text-align: center; padding: 8px; color: var(--dim); font-size: 13px;
-  }
-
-  /* Footer */
-  .footer { text-align: center; margin-top: 16px; font-size: 11px; color: var(--dim); }
-  .footer a { color: var(--accent); text-decoration: none; }
-
-  /* Header sticky */
-  .sticky-bar {
-    position: sticky; top: 0; background: var(--bg); z-index: 10;
-    padding-bottom: 8px;
-  }
+  /* ── Footer ── */
+  .footer { text-align:center; margin-top:20px; font-size:11px; color: var(--dim); }
+  .footer a { color: var(--accent); text-decoration:none; font-weight:500; }
+  .footer a:hover { text-decoration:underline; }
 </style>
 </head>
 <body>
 <div class="container">
-  <div class="header">
-    <div class="badge">Hermes Agent + Stripe Projects</div>
-    <h1>Stack-<span>in-a-Click</span></h1>
-    <p>Provision your SaaS stack with one click. Select services, get your .env.</p>
-    <p class="meta" id="catalog-meta"></p>
+  <!-- HERO -->
+  <div class="hero">
+    <div class="tag">⚡ Hermes Agent + Stripe Projects</div>
+    <h1>Stack-<em>in-a-Click</em></h1>
+    <p>Provision your entire SaaS stack in seconds. Select services, click deploy, get your <code>.env</code>.</p>
+    <p class="stats" id="catalog-meta"></p>
   </div>
 
-  <div class="sticky-bar">
-    <input class="search-box" id="search" placeholder="🔍 Search 57 services across 13 categories..." oninput="filterServices()">
-    <div class="templates" id="templates"></div>
-    <div class="summary-bar" id="summary"></div>
+  <!-- SEARCH -->
+  <div class="search-wrap">
+    <span class="s-icon">🔍</span>
+    <input id="search" placeholder="Search 57 services across 13 categories..." oninput="filter()">
+    <span class="s-clear" id="s-clear" onclick="clearSearch()">✕</span>
   </div>
 
-  <div class="card" id="categories-card">
+  <!-- TEMPLATES -->
+  <div class="tpl-section">
+    <div class="label">⚡ Quick-start templates</div>
+    <div class="tpl-grid" id="templates"></div>
+  </div>
+
+  <!-- SERVICES -->
+  <div class="card">
     <div id="categories"></div>
-    <button class="btn" id="provision-btn" onclick="provision()">
-      🚀 Provision Selected Services
-    </button>
-    <div class="status" id="status"></div>
+    <div class="action-bar">
+      <span class="selection-count" id="sel-count">No services selected</span>
+      <button class="btn" id="provision-btn" onclick="provision()">🚀 Provision</button>
+    </div>
   </div>
 
-  <div class="card" id="results-card" style="display:none">
-    <h3 style="font-size:13px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">📦 Result</h3>
-    <div class="result-list" id="result-list"></div>
-    <div class="env-output" id="env-output"></div>
+  <!-- STATUS -->
+  <div class="status" id="status"></div>
+
+  <!-- RESULTS -->
+  <div class="results-card" id="results-card">
+    <h4>📦 Provisioning Result</h4>
+    <div id="result-list"></div>
+    <div id="env-output" style="display:none;"></div>
     <button class="copy-btn" id="copy-btn" onclick="copyEnv()">📋 Copy .env</button>
   </div>
 
   <div class="footer">
-    Built with <a href="https://hermes-agent.nousresearch.com" target="_blank">Hermes Agent</a> ·
-    <a href="https://stripe.com" target="_blank">Stripe</a> ·
-    <a href="https://nvidia.com" target="_blank">NVIDIA</a> ·
-    Hackathon 2026
+    Built with <a href="https://hermes-agent.nousresearch.com" target="_blank">Hermes Agent</a>
+    · <a href="https://stripe.com" target="_blank">Stripe</a>
+    · <a href="https://nvidia.com" target="_blank">NVIDIA</a>
+    · Hackathon 2026
   </div>
 </div>
 
 <script>
 const API = window.location.origin;
-let catalog = null;
-let selected = new Set();
-let activeTemplate = null;
+let catalog = null, selected = new Set(), activeTemplate = null;
 
 async function init() {
   try {
     const res = await fetch(`${API}/api/services`);
     catalog = await res.json();
     document.getElementById('catalog-meta').textContent =
-      `${catalog.total_services} services · ${Object.keys(catalog.categories).length} categories · ${Object.keys(catalog.templates).length} templates`;
-    renderTemplates();
-    renderCategories();
+      `${catalog.total_services} services · ${Object.keys(catalog.categories).length} categories · ${Object.keys(catalog.templates).length} templates — updated ${catalog.updated}`;
+    renderTemplates(); renderCategories();
   } catch(e) {
-    document.getElementById('categories').innerHTML = '<p style="color:#dc2626">Failed to load catalog.</p>';
+    document.getElementById('categories').innerHTML = '<div style="padding:24px;color:var(--red)">Failed to load catalog.</div>';
   }
 }
 
 function renderTemplates() {
-  const tpl = document.getElementById('templates');
-  tpl.innerHTML = Object.entries(catalog.templates).map(([id, t]) =>
-    `<span class="tpl-chip" data-tpl="${id}" onclick="loadTemplate('${id}')">${t.name}</span>`
+  document.getElementById('templates').innerHTML = Object.entries(catalog.templates).map(([id, t]) =>
+    `<div class="tpl-card" data-tpl="${id}" onclick="loadTemplate('${id}')">
+      <div class="t-name">${t.name}</div>
+      <div class="t-desc">${t.desc}</div>
+    </div>`
   ).join('');
 }
 
 function loadTemplate(id) {
-  activeTemplate = id;
-  selected.clear();
+  activeTemplate = id; selected.clear();
   catalog.templates[id].services.forEach(s => selected.add(s));
-
-  document.querySelectorAll('.tpl-chip').forEach(c => c.classList.toggle('active', c.dataset.tpl === id));
-  updateUI();
+  document.querySelectorAll('.tpl-card').forEach(c => c.classList.toggle('active', c.dataset.tpl === id));
+  updateAll();
 }
 
 function renderCategories() {
-  const container = document.getElementById('categories');
-  container.innerHTML = Object.entries(catalog.categories).map(([cat, data]) => `
-    <div class="cat-group" data-cat="${cat}">
+  document.getElementById('categories').innerHTML = Object.entries(catalog.categories).map(([cat, d]) =>
+    `<div class="cat" data-cat="${cat}">
       <div class="cat-header open" onclick="toggleCat(this)">
-        <div class="left">
-          <span class="icon">${data.icon}</span>
-          <span class="name">${cat}</span>
-          <span class="count">${data.services.length}</span>
+        <div class="c-left">
+          <span class="c-icon">${d.icon}</span>
+          <span class="c-name">${cat}</span>
+          <span class="c-badge">${d.services.length}</span>
         </div>
-        <span class="arrow">▼</span>
+        <span class="c-arrow">▼</span>
       </div>
       <div class="cat-body show">
-        ${data.services.map(s => `
-          <div class="service${selected.has(s.id) ? ' selected' : ''}" data-svc="${s.id}"
-               onclick="toggleService('${s.id}', this)">
-            <div class="s-info">
-              <div class="s-name">${s.name}</div>
-              <div class="s-desc">${s.desc}</div>
-            </div>
-            <span class="tier ${s.tier}">${s.tier === 'free' ? 'Free' : s.tier === 'mixed' ? 'Free+Paid' : 'Paid'}</span>
-          </div>
-        `).join('')}
+        <div class="svc-grid">
+          ${d.services.map(s =>
+            `<div class="svc${selected.has(s.id)?' selected':''}" data-svc="${s.id}" onclick="toggleService('${s.id}',this)">
+              <div class="s-info">
+                <div class="s-name">${s.name}</div>
+                <div class="s-desc">${s.desc}</div>
+              </div>
+              <span class="s-tier tier-${s.tier}">${s.tier==='free'?'Free':s.tier==='mixed'?'Free+':'Paid'}</span>
+            </div>`
+          ).join('')}
+        </div>
       </div>
-    </div>
-  `).join('');
+    </div>`
+  ).join('');
 }
 
-function toggleCat(header) {
-  header.classList.toggle('open');
-  header.nextElementSibling.classList.toggle('show');
-}
-
+function toggleCat(h) { h.classList.toggle('open'); h.nextElementSibling.classList.toggle('show'); }
 function toggleService(id, el) {
-  if (selected.has(id)) { selected.delete(id); el.classList.remove('selected'); }
-  else { selected.add(id); el.classList.add('selected'); }
-  activeTemplate = null;
-  document.querySelectorAll('.tpl-chip').forEach(c => c.classList.remove('active'));
-  updateSummary();
+  selected.has(id) ? selected.delete(id) : selected.add(id);
+  el.classList.toggle('selected');
+  activeTemplate = null; document.querySelectorAll('.tpl-card').forEach(c=>c.classList.remove('active'));
+  updateCount();
 }
-
-function updateUI() {
-  // Re-render categories to reflect selection state
-  document.querySelectorAll('.service').forEach(el => {
-    el.classList.toggle('selected', selected.has(el.dataset.svc));
-  });
-  updateSummary();
+function updateAll() {
+  document.querySelectorAll('.svc').forEach(el => el.classList.toggle('selected', selected.has(el.dataset.svc)));
+  updateCount();
 }
-
-function updateSummary() {
+function updateCount() {
   const n = selected.size;
-  document.getElementById('summary').textContent = n > 0
-    ? `${n} service${n>1?'s':''} selected · ready to provision`
-    : '';
+  document.getElementById('sel-count').innerHTML = n > 0 ? `<strong>${n}</strong> service${n>1?'s':''} selected` : 'No services selected';
 }
-
-function filterServices() {
+function filter() {
   const q = document.getElementById('search').value.toLowerCase();
-  document.querySelectorAll('.cat-group').forEach(group => {
-    const services = group.querySelectorAll('.service');
-    let visible = 0;
-    services.forEach(svc => {
-      const text = (svc.querySelector('.s-name').textContent + svc.querySelector('.s-desc').textContent).toLowerCase();
-      const match = !q || text.includes(q);
-      svc.style.display = match ? '' : 'none';
-      if (match) visible++;
+  document.getElementById('s-clear').classList.toggle('show', q.length > 0);
+  document.querySelectorAll('.cat').forEach(g => {
+    let vis = 0;
+    g.querySelectorAll('.svc').forEach(s => {
+      const t = (s.querySelector('.s-name').textContent + s.querySelector('.s-desc').textContent).toLowerCase();
+      const m = !q || t.includes(q); s.style.display = m ? '' : 'none'; if (m) vis++;
     });
-    group.style.display = visible > 0 ? '' : 'none';
+    g.style.display = vis > 0 ? '' : 'none';
   });
 }
+function clearSearch() { document.getElementById('search').value=''; filter(); }
 
 async function provision() {
-  if (selected.size === 0) {
-    showStatus('Select at least one service!', 'error');
-    return;
-  }
-
-  const btn = document.getElementById('provision-btn');
-  btn.disabled = true;
+  if (!selected.size) return showStatus('Select at least one service!', 'error');
+  const btn = document.getElementById('provision-btn'); btn.disabled = true;
   showStatus('<span class="spinner"></span>Provisioning via Stripe Projects...', 'loading');
-
   try {
-    const res = await fetch(`${API}/api/provision`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ providers: [...selected] }),
-    });
+    const res = await fetch(`${API}/api/provision`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({providers:[...selected]}) });
     const data = await res.json();
-
-    document.getElementById('results-card').style.display = 'block';
-    const resultList = document.getElementById('result-list');
-    resultList.innerHTML = '';
-    data.provisioned.forEach(r => {
-      resultList.innerHTML += `<div class="result-item"><span class="check">✓</span> ${r.name || r.provider}</div>`;
-    });
-    data.errors.forEach(r => {
-      resultList.innerHTML += `<div class="result-item"><span class="fail">✗</span> ${r.provider}: ${r.error}</div>`;
-    });
-
-    const envDiv = document.getElementById('env-output');
-    const copyBtn = document.getElementById('copy-btn');
+    const rc = document.getElementById('results-card'); rc.classList.add('show');
+    document.getElementById('result-list').innerHTML =
+      data.provisioned.map(r => `<div class="result-item"><span class="ri-ok">✓</span>${r.name||r.provider}</div>`).join('') +
+      data.errors.map(r => `<div class="result-item"><span class="ri-err">✗</span>${r.provider}: ${r.error}</div>`).join('');
     if (data.env?.trim()) {
-      envDiv.textContent = data.env;
-      copyBtn.style.display = 'inline-block';
+      document.getElementById('env-output').textContent = data.env;
+      document.getElementById('copy-btn').style.display = 'inline-block';
     }
-
-    showStatus(data.message, data.success ? 'success' : 'error');
-    selected.clear();
-    activeTemplate = null;
-    document.querySelectorAll('.tpl-chip').forEach(c => c.classList.remove('active'));
-    updateUI();
-
-  } catch(e) {
-    showStatus('Connection error: ' + e.message, 'error');
-  } finally {
-    btn.disabled = false;
-  }
+    showStatus(data.message, data.success?'success':'error');
+    selected.clear(); activeTemplate=null;
+    document.querySelectorAll('.tpl-card').forEach(c=>c.classList.remove('active'));
+    updateAll();
+  } catch(e) { showStatus('Connection error: '+e.message, 'error'); }
+  finally { btn.disabled = false; }
 }
-
-function showStatus(msg, type) {
-  const s = document.getElementById('status');
-  s.innerHTML = msg;
-  s.className = 'status show ' + type;
-}
-
-function copyEnv() {
-  navigator.clipboard.writeText(document.getElementById('env-output').textContent).then(() => {
-    showStatus('✅ .env copied to clipboard!', 'success');
-  });
-}
-
+function showStatus(m,t) { const s=document.getElementById('status'); s.innerHTML=m; s.className='status show '+t; }
+function copyEnv() { navigator.clipboard.writeText(document.getElementById('env-output').textContent).then(()=>showStatus('✅ .env copied!','success')); }
 init();
 </script>
 </body>
