@@ -6,160 +6,135 @@
 <title>Stack-in-a-Click — Hermes Agent</title>
 <style>
   :root {
-    --bg: #f8f9fc;
-    --card: #ffffff;
-    --border: #e2e4eb;
-    --accent: #635bff;
-    --accent-glow: #7c3aed;
-    --green: #00a878;
-    --text: #1a1a2e;
-    --dim: #8b8da0;
-    --radius: 12px;
+    --bg: #f8f9fc; --card: #ffffff; --border: #e2e4eb;
+    --accent: #635bff; --accent-glow: #7c3aed; --green: #00a878;
+    --text: #1a1a2e; --dim: #8b8da0; --radius: 12px;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    background: var(--bg);
-    color: var(--text);
+    background: var(--bg); color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
+    min-height: 100vh; padding: 20px;
   }
-  .container { max-width: 640px; width: 100%; }
+  .container { max-width: 720px; margin: 0 auto; }
 
   /* Header */
-  .header { text-align: center; margin-bottom: 32px; }
+  .header { text-align: center; margin-bottom: 24px; }
   .header .badge {
-    display: inline-block;
-    background: linear-gradient(135deg, var(--accent), #4cc9f0);
-    color: #fff;
-    padding: 4px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    margin-bottom: 12px;
+    display: inline-block; background: linear-gradient(135deg, var(--accent), #4cc9f0);
+    color: #fff; padding: 4px 14px; border-radius: 20px; font-size: 12px;
+    font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 12px;
   }
   .header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
   .header h1 span { background: linear-gradient(135deg, var(--accent), #4cc9f0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  .header p { color: var(--dim); font-size: 14px; margin-top: 6px; }
+  .header p { color: var(--dim); font-size: 14px; margin-top: 4px; }
+  .header .meta { font-size: 11px; color: var(--dim); margin-top: 4px; }
+
+  /* Search */
+  .search-box {
+    width: 100%; padding: 12px 16px; border: 1px solid var(--border);
+    border-radius: 10px; font-size: 14px; outline: none; background: var(--card);
+    color: var(--text); margin-bottom: 12px;
+  }
+  .search-box:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99,91,255,0.1); }
+
+  /* Templates */
+  .templates { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .tpl-chip {
+    padding: 8px 14px; border: 1px solid var(--border); border-radius: 20px;
+    font-size: 13px; cursor: pointer; background: var(--card); color: var(--text);
+    transition: all 0.2s; user-select: none; white-space: nowrap;
+  }
+  .tpl-chip:hover { border-color: var(--accent); background: rgba(99,91,255,0.04); }
+  .tpl-chip.active { border-color: var(--accent); background: rgba(99,91,255,0.08); color: var(--accent); font-weight: 600; }
 
   /* Card */
   .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 24px;
-    margin-bottom: 16px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; margin-bottom: 16px;
   }
-  .card h3 { font-size: 14px; font-weight: 600; margin-bottom: 16px; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; }
 
-  /* Service items */
-  .service-list { display: flex; flex-direction: column; gap: 10px; }
+  /* Category */
+  .cat-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; cursor: pointer; user-select: none;
+    border-bottom: 1px solid transparent;
+  }
+  .cat-header:hover { color: var(--accent); }
+  .cat-header .left { display: flex; align-items: center; gap: 10px; }
+  .cat-header .icon { font-size: 20px; }
+  .cat-header .name { font-weight: 600; font-size: 14px; }
+  .cat-header .count { font-size: 12px; color: var(--dim); margin-left: 4px; }
+  .cat-header .arrow { font-size: 12px; color: var(--dim); transition: transform 0.2s; }
+  .cat-header.open .arrow { transform: rotate(180deg); }
+  .cat-header.open { border-bottom-color: var(--border); }
+
+  .cat-body { display: none; padding: 8px 0; }
+  .cat-body.show { display: block; }
+
+  /* Service */
   .service {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 16px;
-    background: #f8f9fc;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.2s;
-    user-select: none;
+    display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+    border-radius: 8px; cursor: pointer; transition: all 0.15s; user-select: none;
   }
-  .service:hover { border-color: var(--accent); background: rgba(99,91,255,0.04); }
-  .service.selected { border-color: var(--accent); background: rgba(99,91,255,0.06); box-shadow: 0 0 20px rgba(99,91,255,0.08); }
-  .service .icon { font-size: 22px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: #eef0f6; border-radius: 8px; }
-  .service .info { flex: 1; }
-  .service .info .name { font-weight: 600; font-size: 15px; }
-  .service .info .desc { font-size: 12px; color: var(--dim); margin-top: 2px; }
-  .service .tier {
-    font-size: 11px;
-    padding: 3px 8px;
-    border-radius: 6px;
-    font-weight: 500;
-  }
+  .service:hover { background: rgba(99,91,255,0.03); }
+  .service.selected { background: rgba(99,91,255,0.06); border: 1px solid var(--accent); padding: 9px 11px; }
+  .service .s-name { font-weight: 500; font-size: 14px; flex: 1; }
+  .service .s-desc { font-size: 12px; color: var(--dim); }
+  .service .s-info { flex: 1; }
+  .service .tier { font-size: 10px; padding: 2px 8px; border-radius: 5px; font-weight: 500; }
   .tier.free { background: rgba(0,168,120,0.1); color: var(--green); }
-  .tier.payg { background: #eef0f6; color: var(--dim); }
+  .tier.mixed { background: rgba(99,91,255,0.08); color: var(--accent); }
+  .tier.paid { background: #fef2f2; color: #dc2626; }
 
   /* Button */
   .btn {
-    width: 100%;
-    padding: 14px;
-    background: linear-gradient(135deg, var(--accent), #7c3aed);
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    letter-spacing: 0.3px;
+    width: 100%; padding: 14px; background: linear-gradient(135deg, var(--accent), #7c3aed);
+    color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; letter-spacing: 0.3px;
   }
   .btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 30px rgba(99,91,255,0.3); }
   .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
   /* Status */
   .status {
-    text-align: center;
-    padding: 12px;
-    border-radius: 8px;
-    margin-top: 12px;
-    font-size: 13px;
-    display: none;
+    text-align: center; padding: 10px; border-radius: 8px; margin-top: 10px;
+    font-size: 13px; display: none;
   }
   .status.show { display: block; }
-  .status.loading { background: rgba(99,91,255,0.1); color: var(--accent-glow); }
-  .status.success { background: rgba(0,212,170,0.1); color: var(--green); }
-  .status.error { background: rgba(255,77,77,0.1); color: #ff4d4d; }
+  .status.loading { background: rgba(99,91,255,0.08); color: var(--accent-glow); }
+  .status.success { background: rgba(0,168,120,0.08); color: var(--green); }
+  .status.error { background: rgba(255,77,77,0.08); color: #dc2626; }
 
-  /* Spinner */
-  .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid transparent; border-top-color: currentColor; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 8px; }
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid transparent; border-top-color: currentColor; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 6px; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* Env output */
-  .env-output {
-    background: #f1f2f6;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 16px;
-    font-family: 'SF Mono', 'Fira Code', monospace;
-    font-size: 12px;
-    color: #1a6e4a;
-    white-space: pre-wrap;
-    word-break: break-all;
-    max-height: 300px;
-    overflow-y: auto;
-    margin-top: 8px;
+  /* Results */
+  .result-item { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 14px; }
+  .result-item .check { color: var(--green); font-weight: bold; }
+  .result-item .fail { color: #dc2626; font-weight: bold; }
+
+  .env-output { display: none; }
+  .copy-btn {
+    margin-top: 8px; padding: 8px 16px; background: var(--border); border: none;
+    color: var(--text); border-radius: 6px; font-size: 12px; cursor: pointer;
     display: none;
   }
-  .env-output.show { display: block; }
+  .copy-btn:hover { background: var(--accent); color: #fff; }
 
-  .copy-btn {
-    margin-top: 8px;
-    padding: 6px 14px;
-    background: var(--border);
-    border: none;
-    color: var(--text);
-    border-radius: 6px;
-    font-size: 12px;
-    cursor: pointer;
+  .summary-bar {
+    text-align: center; padding: 8px; color: var(--dim); font-size: 13px;
   }
-  .copy-btn:hover { background: var(--accent); }
-
-  /* Result list */
-  .result-list { margin-top: 12px; }
-  .result-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 14px; }
-  .result-item .check { color: var(--green); font-weight: bold; }
-  .result-item .fail { color: #ff4d4d; font-weight: bold; }
 
   /* Footer */
-  .footer { text-align: center; margin-top: 20px; font-size: 11px; color: var(--dim); }
+  .footer { text-align: center; margin-top: 16px; font-size: 11px; color: var(--dim); }
   .footer a { color: var(--accent); text-decoration: none; }
+
+  /* Header sticky */
+  .sticky-bar {
+    position: sticky; top: 0; background: var(--bg); z-index: 10;
+    padding-bottom: 8px;
+  }
 </style>
 </head>
 <body>
@@ -168,13 +143,17 @@
     <div class="badge">Hermes Agent + Stripe Projects</div>
     <h1>Stack-<span>in-a-Click</span></h1>
     <p>Provision your SaaS stack with one click. Select services, get your .env.</p>
+    <p class="meta" id="catalog-meta"></p>
   </div>
 
-  <div class="card" id="services-card">
-    <h3>🛠️ Which services do you need?</h3>
-    <div class="service-list" id="service-list">
-      <!-- filled by JS -->
-    </div>
+  <div class="sticky-bar">
+    <input class="search-box" id="search" placeholder="🔍 Search 57 services across 13 categories..." oninput="filterServices()">
+    <div class="templates" id="templates"></div>
+    <div class="summary-bar" id="summary"></div>
+  </div>
+
+  <div class="card" id="categories-card">
+    <div id="categories"></div>
     <button class="btn" id="provision-btn" onclick="provision()">
       🚀 Provision Selected Services
     </button>
@@ -182,10 +161,10 @@
   </div>
 
   <div class="card" id="results-card" style="display:none">
-    <h3>📦 Result</h3>
+    <h3 style="font-size:13px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">📦 Result</h3>
     <div class="result-list" id="result-list"></div>
     <div class="env-output" id="env-output"></div>
-    <button class="copy-btn" id="copy-btn" style="display:none" onclick="copyEnv()">📋 Copy .env</button>
+    <button class="copy-btn" id="copy-btn" onclick="copyEnv()">📋 Copy .env</button>
   </div>
 
   <div class="footer">
@@ -198,53 +177,117 @@
 
 <script>
 const API = window.location.origin;
+let catalog = null;
+let selected = new Set();
+let activeTemplate = null;
 
-let services = {};
-
-async function loadServices() {
+async function init() {
   try {
     const res = await fetch(`${API}/api/services`);
-    const data = await res.json();
-    services = data.services;
-    renderServices();
-  } catch (e) {
-    document.getElementById('service-list').innerHTML =
-      '<div style="color:#ff4d4d">Failed to load services. API may be down.</div>';
+    catalog = await res.json();
+    document.getElementById('catalog-meta').textContent =
+      `${catalog.total_services} services · ${Object.keys(catalog.categories).length} categories · ${Object.keys(catalog.templates).length} templates`;
+    renderTemplates();
+    renderCategories();
+  } catch(e) {
+    document.getElementById('categories').innerHTML = '<p style="color:#dc2626">Failed to load catalog.</p>';
   }
 }
 
-function renderServices() {
-  const list = document.getElementById('service-list');
-  list.innerHTML = Object.entries(services).map(([key, svc]) => `
-    <div class="service" data-provider="${key}" onclick="toggleService(this, '${key}')">
-      <div class="icon">${svc.icon}</div>
-      <div class="info">
-        <div class="name">${svc.name}</div>
-        <div class="desc">${svc.desc}</div>
+function renderTemplates() {
+  const tpl = document.getElementById('templates');
+  tpl.innerHTML = Object.entries(catalog.templates).map(([id, t]) =>
+    `<span class="tpl-chip" data-tpl="${id}" onclick="loadTemplate('${id}')">${t.name}</span>`
+  ).join('');
+}
+
+function loadTemplate(id) {
+  activeTemplate = id;
+  selected.clear();
+  catalog.templates[id].services.forEach(s => selected.add(s));
+
+  document.querySelectorAll('.tpl-chip').forEach(c => c.classList.toggle('active', c.dataset.tpl === id));
+  updateUI();
+}
+
+function renderCategories() {
+  const container = document.getElementById('categories');
+  container.innerHTML = Object.entries(catalog.categories).map(([cat, data]) => `
+    <div class="cat-group" data-cat="${cat}">
+      <div class="cat-header open" onclick="toggleCat(this)">
+        <div class="left">
+          <span class="icon">${data.icon}</span>
+          <span class="name">${cat}</span>
+          <span class="count">${data.services.length}</span>
+        </div>
+        <span class="arrow">▼</span>
       </div>
-      <div class="tier ${svc.tier}">${svc.tier === 'free' ? 'Free' : 'Pay-as-you-go'}</div>
+      <div class="cat-body show">
+        ${data.services.map(s => `
+          <div class="service${selected.has(s.id) ? ' selected' : ''}" data-svc="${s.id}"
+               onclick="toggleService('${s.id}', this)">
+            <div class="s-info">
+              <div class="s-name">${s.name}</div>
+              <div class="s-desc">${s.desc}</div>
+            </div>
+            <span class="tier ${s.tier}">${s.tier === 'free' ? 'Free' : s.tier === 'mixed' ? 'Free+Paid' : 'Paid'}</span>
+          </div>
+        `).join('')}
+      </div>
     </div>
   `).join('');
 }
 
-function toggleService(el, provider) {
-  el.classList.toggle('selected');
+function toggleCat(header) {
+  header.classList.toggle('open');
+  header.nextElementSibling.classList.toggle('show');
 }
 
-function getSelected() {
-  return [...document.querySelectorAll('.service.selected')].map(el => el.dataset.provider);
+function toggleService(id, el) {
+  if (selected.has(id)) { selected.delete(id); el.classList.remove('selected'); }
+  else { selected.add(id); el.classList.add('selected'); }
+  activeTemplate = null;
+  document.querySelectorAll('.tpl-chip').forEach(c => c.classList.remove('active'));
+  updateSummary();
+}
+
+function updateUI() {
+  // Re-render categories to reflect selection state
+  document.querySelectorAll('.service').forEach(el => {
+    el.classList.toggle('selected', selected.has(el.dataset.svc));
+  });
+  updateSummary();
+}
+
+function updateSummary() {
+  const n = selected.size;
+  document.getElementById('summary').textContent = n > 0
+    ? `${n} service${n>1?'s':''} selected · ready to provision`
+    : '';
+}
+
+function filterServices() {
+  const q = document.getElementById('search').value.toLowerCase();
+  document.querySelectorAll('.cat-group').forEach(group => {
+    const services = group.querySelectorAll('.service');
+    let visible = 0;
+    services.forEach(svc => {
+      const text = (svc.querySelector('.s-name').textContent + svc.querySelector('.s-desc').textContent).toLowerCase();
+      const match = !q || text.includes(q);
+      svc.style.display = match ? '' : 'none';
+      if (match) visible++;
+    });
+    group.style.display = visible > 0 ? '' : 'none';
+  });
 }
 
 async function provision() {
-  const selected = getSelected();
-  if (selected.length === 0) {
+  if (selected.size === 0) {
     showStatus('Select at least one service!', 'error');
     return;
   }
 
   const btn = document.getElementById('provision-btn');
-  const status = document.getElementById('status');
-
   btn.disabled = true;
   showStatus('<span class="spinner"></span>Provisioning via Stripe Projects...', 'loading');
 
@@ -252,35 +295,34 @@ async function provision() {
     const res = await fetch(`${API}/api/provision`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ providers: selected }),
+      body: JSON.stringify({ providers: [...selected] }),
     });
     const data = await res.json();
 
-    // Show results
     document.getElementById('results-card').style.display = 'block';
     const resultList = document.getElementById('result-list');
     resultList.innerHTML = '';
-
     data.provisioned.forEach(r => {
-      resultList.innerHTML += `<div class="result-item"><span class="check">✓</span> ${r.icon} ${r.name}</div>`;
+      resultList.innerHTML += `<div class="result-item"><span class="check">✓</span> ${r.name || r.provider}</div>`;
     });
     data.errors.forEach(r => {
-      resultList.innerHTML += `<div class="result-item"><span class="fail">✗</span> ${r.icon} ${r.name}: ${r.error}</div>`;
+      resultList.innerHTML += `<div class="result-item"><span class="fail">✗</span> ${r.provider}: ${r.error}</div>`;
     });
 
-    // Store .env for copying (don't display it)
     const envDiv = document.getElementById('env-output');
     const copyBtn = document.getElementById('copy-btn');
-    if (data.env && data.env.trim()) {
+    if (data.env?.trim()) {
       envDiv.textContent = data.env;
       copyBtn.style.display = 'inline-block';
-      copyBtn.textContent = '📋 Copy .env';
     }
 
     showStatus(data.message, data.success ? 'success' : 'error');
-    document.querySelectorAll('.service.selected').forEach(el => el.classList.remove('selected'));
+    selected.clear();
+    activeTemplate = null;
+    document.querySelectorAll('.tpl-chip').forEach(c => c.classList.remove('active'));
+    updateUI();
 
-  } catch (e) {
+  } catch(e) {
     showStatus('Connection error: ' + e.message, 'error');
   } finally {
     btn.disabled = false;
@@ -294,13 +336,12 @@ function showStatus(msg, type) {
 }
 
 function copyEnv() {
-  const env = document.getElementById('env-output').textContent;
-  navigator.clipboard.writeText(env).then(() => {
+  navigator.clipboard.writeText(document.getElementById('env-output').textContent).then(() => {
     showStatus('✅ .env copied to clipboard!', 'success');
   });
 }
 
-loadServices();
+init();
 </script>
 </body>
 </html>
