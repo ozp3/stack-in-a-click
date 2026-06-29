@@ -4,616 +4,224 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stack-in-a-Click — Hermes Agent</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  /* ── Design tokens ── */
   :root {
-    --bg:        #f0f2f8;
-    --surface:   rgba(255,255,255,0.6);
-    --border:    rgba(255,255,255,0.5);
-    --text:      #1a1d2e;
-    --dim:       #777b8e;
-    --accent:    #5b4cf0;
-    --accent-hv: #4a3dd4;
-    --green:     #0ea878;
-    --red:       #e54545;
-    --radius:    16px;
-    --radius-lg: 22px;
-    --glass-blur: blur(18px) saturate(170%);
-    --glass-shadow: 0 8px 40px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.03), inset 0 1px 0 rgba(255,255,255,0.7);
+    --bg:#fafaf8; --surface:#fff; --text:#111; --dim:#6b6b6b;
+    --accent:#c9a84c; --accent-hv:#b8922e; --green:#2d6a4f;
+    --red:#c44545; --border:#e5e3e0; --radius:0; --radius-sm:2px;
   }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh;padding:40px 20px 60px}
+  .container{max-width:800px;margin:0 auto}
+  h1,h2,.cat-name,.modal-box h3,.tpl-card .t-name{font-family:'Playfair Display',serif}
 
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body {
-    background: linear-gradient(135deg, #f0f2f8 0%, #e8ecf4 30%, #f5f3ff 60%, #eef2f8 100%);
-    background-attachment: fixed;
-    color: var(--text);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-    -webkit-font-smoothing: antialiased; min-height:100vh; padding: 32px 16px;
-  }
-  .container { max-width: 780px; margin: 0 auto; }
+  .hero{text-align:center;margin-bottom:48px}
+  .hero .tag{display:inline-block;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);padding:4px 14px;margin-bottom:20px;font-weight:600}
+  .hero h1{font-size:42px;font-weight:700;letter-spacing:-1px;line-height:1.1;margin-bottom:12px}
+  .hero h1 em{font-style:italic;color:var(--accent)}
+  .hero p{color:var(--dim);font-size:16px;max-width:500px;margin:0 auto}
+  .hero .stats{font-size:11px;color:var(--dim);margin-top:10px;letter-spacing:1px;text-transform:uppercase}
 
-  /* ── Header ── */
-  .hero { text-align:center; margin-bottom:28px; }
-  .hero .tag {
-    display:inline-flex; align-items:center; gap:6px;
-    background: rgba(255,255,255,0.55); backdrop-filter: var(--glass-blur);
-    border: 1px solid var(--border); padding: 6px 18px; border-radius: 24px;
-    font-size: 12px; font-weight: 600; color: var(--accent);
-    text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 14px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.03);
-  }
-  .hero h1 { font-size: 34px; font-weight: 800; letter-spacing: -0.8px; line-height: 1.15; }
-  .hero h1 em { font-style: normal; background: linear-gradient(135deg, var(--accent) 0%, #8b5cf6 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-  .hero p { color: var(--dim); font-size: 15px; margin-top: 6px; }
-  .hero .stats { font-size: 12px; color: var(--dim); margin-top: 6px; }
+  .search-wrap{position:relative;margin-bottom:32px;max-width:500px;margin-left:auto;margin-right:auto}
+  .search-wrap input{width:100%;padding:14px 42px;border:none;border-bottom:1px solid var(--border);font-size:15px;outline:none;background:transparent;color:var(--text);font-family:'Inter',sans-serif;transition:border-color 0.2s}
+  .search-wrap input:focus{border-bottom-color:var(--text)}
+  .search-wrap .s-icon{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--dim);font-size:15px}
+  .search-wrap .s-clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:18px;color:var(--dim);cursor:pointer;display:none}
+  .search-wrap .s-clear.show{display:block}
 
-  /* ── Search ── */
-  .search-wrap { position:relative; margin-bottom: 16px; }
-  .search-wrap input {
-    width: 100%; padding: 14px 18px 14px 44px; border: 1px solid var(--border);
-    border-radius: var(--radius); font-size: 15px; outline: none;
-    background: var(--surface); backdrop-filter: var(--glass-blur);
-    color: var(--text); transition: all 0.2s;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.03);
-  }
-  .search-wrap input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(91,76,240,0.08), var(--glass-shadow); }
-  .search-wrap .s-icon { position:absolute; left:16px; top:50%; transform:translateY(-50%); color: var(--dim); font-size: 15px; pointer-events:none; }
-  .search-wrap .s-clear { position:absolute; right:14px; top:50%; transform:translateY(-50%); font-size: 18px; color: var(--dim); cursor:pointer; display:none; user-select:none; }
-  .search-wrap .s-clear.show { display:block; }
+  .tpl-section{margin-bottom:40px;text-align:center}
+  .tpl-section .label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-bottom:16px}
+  .tpl-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:20px}
+  .tpl-card{text-align:center;cursor:pointer;padding:8px 0;border-bottom:2px solid transparent;transition:all 0.2s;user-select:none;min-width:140px}
+  .tpl-card:hover{border-bottom-color:var(--border)}
+  .tpl-card.active{border-bottom-color:var(--text)}
+  .tpl-card .t-name{font-size:15px;font-weight:600;margin-bottom:3px}
+  .tpl-card .t-desc{font-size:11px;color:var(--dim)}
 
-  /* ── Templates ── */
-  .tpl-section { margin-bottom: 18px; }
-  .tpl-section .label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--dim); margin-bottom: 10px; }
-  .tpl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 10px; }
-  .tpl-card {
-    background: var(--surface); backdrop-filter: var(--glass-blur);
-    border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 16px; cursor: pointer; transition: all 0.2s; user-select: none;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.03);
-  }
-  .tpl-card:hover { border-color: var(--accent); box-shadow: 0 8px 30px rgba(91,76,240,0.1); transform: translateY(-1px); }
-  .tpl-card.active { border-color: var(--accent); background: rgba(91,76,240,0.04); box-shadow: 0 4px 20px rgba(91,76,240,0.1); }
-  .tpl-card .t-name { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
-  .tpl-card .t-desc { font-size: 12px; color: var(--dim); line-height: 1.45; }
+  .card{background:var(--surface);border:1px solid var(--border);margin-bottom:40px}
 
-  /* ── Card ── */
-  .card {
-    background: var(--surface); backdrop-filter: var(--glass-blur);
-    border: 1px solid var(--border); border-radius: var(--radius-lg);
-    overflow: hidden; box-shadow: var(--glass-shadow);
-  }
-  .cat { border-bottom: 1px solid var(--border); }
-  .cat:last-child { border-bottom: none; }
-  .cat-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 15px 20px; cursor: pointer; user-select: none; transition: background 0.15s;
-  }
-  .cat-header:hover { background: rgba(91,76,240,0.03); }
-  .cat-header .c-left { display: flex; align-items: center; gap: 11px; }
-  .cat-header .c-icon { font-size: 19px; opacity: 0.85; }
-  .cat-header .c-name { font-weight: 700; font-size: 14px; }
-  .cat-header .c-badge {
-    font-size: 11px; background: rgba(91,76,240,0.06); color: var(--accent);
-    padding: 2px 8px; border-radius: 10px; font-weight: 600;
-  }
-  .cat-header .c-arrow { font-size: 11px; color: var(--dim); transition: transform 0.2s; }
-  .cat-header.open .c-arrow { transform: rotate(180deg); }
-  .cat-body { display: none; padding: 0 20px 14px; }
-  .cat-body.show { display: block; }
+  .cat{border-bottom:1px solid var(--border)}
+  .cat:last-child{border-bottom:none}
+  .cat-header{display:flex;align-items:center;justify-content:space-between;padding:18px 32px;cursor:pointer;user-select:none;transition:background 0.15s}
+  .cat-header:hover{background:rgba(0,0,0,0.02)}
+  .cat-header .c-left{display:flex;align-items:center;gap:12px}
+  .cat-header .c-icon{font-size:18px}
+  .cat-header .c-name{font-size:16px;font-weight:600}
+  .cat-header .c-badge{font-size:10px;color:var(--dim);letter-spacing:1px}
+  .cat-header .c-arrow{font-size:10px;color:var(--dim);transition:transform 0.2s}
+  .cat-header.open .c-arrow{transform:rotate(180deg)}
+  .cat-body{display:none;padding:0 32px 20px}
+  .cat-body.show{display:block}
 
-  .svc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px,1fr)); gap: 6px; }
-  .svc {
-    display: flex; align-items: flex-start; gap: 8px; padding: 10px 12px;
-    border-radius: 12px; cursor: pointer; transition: all 0.15s; user-select: none;
-    border: 1px solid transparent;
-    background: rgba(255,255,255,0.3);
-  }
-  .svc:hover { background: rgba(91,76,240,0.04); border-color: rgba(91,76,240,0.2); }
-  .svc.selected { background: rgba(91,76,240,0.06); border-color: var(--accent); box-shadow: 0 4px 16px rgba(91,76,240,0.1); }
-  .svc .s-info { flex:1; min-width:0; }
-  .svc .s-name { font-weight: 600; font-size: 13px; }
-  .svc .s-desc { font-size: 11px; color: var(--dim); line-height: 1.35; margin-top: 1px; }
-  .svc .s-tier { font-size: 9px; padding: 2px 7px; border-radius: 5px; font-weight: 700; text-transform: uppercase; letter-spacing:0.3px; white-space:nowrap; }
-  .tier-free   { background: rgba(14,168,120,0.08); color: var(--green); }
-  .tier-mixed  { background: rgba(91,76,240,0.07); color: var(--accent); }
-  .tier-paid   { background: rgba(229,69,69,0.07); color: var(--red); }
+  .svc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:4px}
+  .svc{display:flex;align-items:flex-start;gap:10px;padding:12px 16px;cursor:pointer;transition:all 0.15s;user-select:none;border-left:3px solid transparent}
+  .svc:hover{background:rgba(0,0,0,0.02)}
+  .svc.selected{background:rgba(0,0,0,0.04);border-left-color:var(--text)}
+  .svc .s-info{flex:1;min-width:0}
+  .svc .s-name{font-weight:600;font-size:13px}
+  .svc .s-desc{font-size:11px;color:var(--dim);line-height:1.4;margin-top:2px}
+  .svc .s-tier{font-size:9px;padding:2px 6px;border:1px solid var(--border);letter-spacing:0.5px;text-transform:uppercase;font-weight:600;white-space:nowrap}
+  .tier-free{border-color:var(--green);color:var(--green)}
+  .tier-mixed{border-color:var(--accent);color:var(--accent)}
+  .tier-paid{border-color:var(--red);color:var(--red)}
 
-  /* ── Cart (Liquid Glass + Glassmorphism) ── */
-  .cart {
-    position:fixed; top:100px; right:24px; width:290px; z-index:100; display:none;
-    background:rgba(255,255,255,0.65); backdrop-filter:blur(20px) saturate(180%);
-    -webkit-backdrop-filter:blur(20px) saturate(180%);
-    border:1px solid rgba(255,255,255,0.5); border-radius:20px;
-    box-shadow:0 8px 40px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.6);
-    overflow:hidden;
-  }
-  .cart.show { display:block; }
-  .cart-header {
-    padding:16px 20px 12px; font-size:14px; font-weight:700; color:var(--text);
-    letter-spacing:-0.3px; display:flex; align-items:center; gap:8px;
-    background:rgba(255,255,255,0.3);
-  }
-  .cart-header .cart-dot { width:7px; height:7px; background:var(--green); border-radius:50%; }
-  .cart-body { padding:0; }
-  .cart-list { max-height:280px; overflow-y:auto; }
-  .cart-item {
-    display:flex; align-items:center; justify-content:space-between;
-    padding:10px 20px; font-size:13px; transition:background 0.15s;
-    border-bottom:1px solid rgba(0,0,0,0.04);
-  }
-  .cart-item:last-child { border-bottom:none; }
-  .cart-item:hover { background:rgba(255,255,255,0.4); }
-  .cart-item .ci-info { flex:1; min-width:0; }
-  .cart-item .ci-name { font-weight:600; letter-spacing:-0.2px; }
-  .cart-item .ci-cat { font-size:11px; color:var(--dim); margin-top:1px; }
-  .cart-item-remove {
-    color:var(--dim); cursor:pointer; font-size:13px; width:24px; height:24px;
-    display:flex; align-items:center; justify-content:center; border-radius:50%;
-    transition:all 0.15s; flex-shrink:0;
-  }
-  .cart-item-remove:hover { background:rgba(229,69,69,0.1); color:var(--red); }
-  .cart-footer {
-    padding:14px 20px; background:rgba(255,255,255,0.3);
-    border-top:1px solid rgba(0,0,0,0.04);
-  }
-  .btn-glass {
-    width:100%; padding:12px; border:none; border-radius:14px; font-size:13px; font-weight:700;
-    cursor:pointer; transition:all 0.25s; letter-spacing:-0.2px;
-    background:linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%);
-    color:#fff; box-shadow:0 4px 16px rgba(26,26,46,0.2);
-  }
-  .btn-glass:hover:not(:disabled) {
-    transform:translateY(-1px); box-shadow:0 8px 28px rgba(26,26,46,0.3);
-  }
-  .btn-glass:disabled { opacity:0.4; cursor:not-allowed; }
+  .btn{display:inline-block;padding:14px 40px;background:var(--text);color:#fff;border:none;font-size:13px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all 0.2s}
+  .btn:hover:not(:disabled){background:#333}
+  .btn:disabled{opacity:0.3;cursor:not-allowed}
+  .btn-outline{background:transparent;color:var(--text);border:1px solid var(--text)}
+  .btn-outline:hover:not(:disabled){background:var(--text);color:#fff}
 
-  .btn {
-    padding: 12px 28px; background: linear-gradient(135deg, var(--accent), #7c3aed);
-    color: #fff; border: none; border-radius: var(--radius-sm); font-size: 14px;
-    font-weight: 700; cursor: pointer; transition: all 0.2s; letter-spacing: 0.2px;
-  }
-  .btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(99,91,255,0.3); }
-  .btn:disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(30%); }
+  .status{text-align:center;padding:14px;font-size:13px;display:none;margin-bottom:24px;letter-spacing:0.5px}
+  .status.show{display:block}
+  .status.loading{color:var(--dim)}
+  .status.success{color:var(--green)}
+  .status.error{color:var(--red)}
+  .spinner{display:inline-block;width:14px;height:14px;border:1px solid var(--dim);border-top-color:var(--text);border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;margin-right:8px}
+  @keyframes spin{to{transform:rotate(360deg)}}
 
-  /* ── Status / results ── */
-  .status {
-    text-align:center; padding: 12px; border-radius: 12px; font-size:13px;
-    display:none; margin-top:12px; backdrop-filter: var(--glass-blur);
-  }
-  .status.show { display:block; }
-  .status.loading { background: rgba(99,91,255,0.06); color: var(--accent); }
-  .status.success { background: rgba(0,168,120,0.06); color: var(--green); }
-  .status.error   { background: rgba(229,69,69,0.06); color: var(--red); }
-  .spinner { display:inline-block; width:14px; height:14px; border:2px solid transparent; border-top-color:currentColor; border-radius:50%; animation:spin 0.8s linear infinite; vertical-align:middle; margin-right:6px; }
-  @keyframes spin { to{transform:rotate(360deg)} }
+  .cart{position:fixed;top:60px;right:32px;width:260px;background:var(--surface);border:1px solid var(--border);z-index:100;display:none}
+  .cart.show{display:block}
+  .cart-header{padding:16px 20px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border-bottom:1px solid var(--border)}
+  .cart-list{max-height:260px;overflow-y:auto}
+  .cart-item{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;font-size:12px;border-bottom:1px solid var(--border)}
+  .cart-item:last-child{border-bottom:none}
+  .cart-item .ci-cat{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px}
+  .cart-item .ci-name{font-weight:600;margin-top:2px}
+  .cart-item-remove{color:var(--dim);cursor:pointer;font-size:14px}
+  .cart-item-remove:hover{color:var(--red)}
+  .cart-footer{padding:16px 20px;border-top:1px solid var(--border)}
+  .cart-footer .btn{width:100%;text-align:center}
 
-  .results-card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 20px; margin-top: 16px; box-shadow: var(--shadow); display: none;
-  }
-  .results-card.show { display: block; }
-  .results-card h4 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--dim); margin-bottom: 10px; }
-  .result-item { display:flex; align-items:center; gap:8px; padding:4px 0; font-size:14px; }
-  .ri-ok { color: var(--green); font-weight: 700; }
-  .ri-err { color: var(--red); font-weight: 700; }
-  .copy-btn {
-    margin-top:12px; padding:8px 18px; background: var(--border); border:none;
-    color: var(--text); border-radius: var(--radius-sm); font-size:12px; font-weight:600;
-    cursor:pointer; display:none;
-  }
-  .copy-btn:hover { background: var(--accent); color: #fff; }
+  .modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(250,250,248,0.95);z-index:2000;align-items:center;justify-content:center}
+  .modal-overlay.show{display:flex}
+  .modal-box{background:var(--surface);border:1px solid var(--border);padding:40px;max-width:520px;width:90%;max-height:80vh;overflow-y:auto}
+  .modal-box h3{font-size:22px;font-weight:600;margin-bottom:24px;letter-spacing:-0.5px}
+  .modal-svc{border-bottom:1px solid var(--border);padding:16px 0}
+  .modal-svc:last-child{border-bottom:none}
+  .modal-svc-name{font-weight:600;font-size:13px;margin-bottom:8px;letter-spacing:0.5px}
+  .modal-env{font-family:'SF Mono','Fira Code',monospace;font-size:11px;color:var(--dim);background:#f9f9f7;padding:10px 14px;white-space:pre-wrap;word-break:break-all;max-height:100px;overflow-y:auto;margin-bottom:8px}
+  .modal-copy-btn{font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:600;border:none;background:none;color:var(--dim);cursor:pointer;padding:4px 0}
+  .modal-copy-btn:hover{color:var(--text)}
+  .modal-actions{display:flex;gap:12px;margin-top:24px;justify-content:space-between}
+  .modal-actions button{padding:12px 24px;font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:600;cursor:pointer}
+  .btn-copyall{background:var(--text);color:#fff;border:none}
+  .btn-copyall:hover{background:#333}
+  .btn-close{background:none;border:1px solid var(--border);color:var(--text)}
+  .btn-close:hover{background:var(--text);color:#fff}
 
-  /* ── Footer ── */
-  .footer { text-align:center; margin-top:20px; font-size:11px; color: var(--dim); }
-  .footer a { color: var(--accent); text-decoration:none; font-weight:500; }
-  .footer a:hover { text-decoration:underline; }
+  .chat-bubble{position:fixed;bottom:32px;right:32px;width:48px;height:48px;background:var(--text);color:#fff;border:none;border-radius:50%;font-size:20px;cursor:pointer;z-index:1000;display:flex;align-items:center;justify-content:center;transition:background 0.2s}
+  .chat-bubble:hover{background:#333}
+  .chat-panel{position:fixed;bottom:96px;right:32px;width:340px;max-height:440px;background:var(--surface);border:1px solid var(--border);z-index:999;display:none;flex-direction:column}
+  .chat-panel.open{display:flex}
+  .chat-panel-header{padding:16px 20px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+  .chat-panel-header span:last-child{margin-left:auto;font-size:10px;cursor:pointer;opacity:0.5}
+  .chat-panel-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;max-height:280px;font-size:13px}
+  .chat-msg{padding:10px 14px;max-width:85%;line-height:1.5}
+  .chat-msg.user{align-self:flex-end;background:var(--text);color:#fff}
+  .chat-msg.bot{align-self:flex-start;background:#f5f5f3;color:var(--text)}
+  .chat-msg .time{font-size:9px;opacity:0.5;margin-top:4px}
+  .chat-typing{align-self:flex-start;padding:10px 14px;font-size:12px;color:var(--dim);display:none}
+  .chat-typing.show{display:block}
+  .chat-input-wrap{display:flex;padding:12px;gap:8px;border-top:1px solid var(--border)}
+  .chat-input-wrap input{flex:1;padding:8px 12px;border:1px solid var(--border);font-size:13px;outline:none;background:transparent;color:var(--text);font-family:'Inter',sans-serif}
+  .chat-input-wrap input:focus{border-color:var(--text)}
+  .chat-input-wrap button{padding:8px 16px;background:var(--text);color:#fff;border:none;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer}
+  .chat-input-wrap button:hover{background:#333}
 
-  /* ── Chat Widget ── */
-  .chat-bubble {
-    position:fixed; bottom:24px; right:24px; width:52px; height:52px;
-    background: linear-gradient(135deg, var(--accent), #7c3aed);
-    border:none; border-radius:50%; color:#fff; font-size:24px; cursor:pointer;
-    box-shadow: 0 4px 20px rgba(99,91,255,0.35); z-index:1000;
-    display:flex; align-items:center; justify-content:center;
-    transition: all 0.2s;
-  }
-  .chat-bubble:hover { transform:scale(1.08); }
-  .chat-panel {
-    position:fixed; bottom:88px; right:24px; width:360px; max-height:480px;
-    background: var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
-    box-shadow: 0 8px 40px rgba(0,0,0,0.12); z-index:999;
-    display:none; flex-direction:column; overflow:hidden;
-  }
-  .chat-panel.open { display:flex; }
-  .chat-panel-header {
-    padding:14px 16px; background: linear-gradient(135deg, var(--accent), #7c3aed);
-    color:#fff; font-weight:700; font-size:13px; display:flex; align-items:center; gap:8px;
-  }
-  .chat-panel-messages {
-    flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:8px;
-    max-height:320px; font-size:13px;
-  }
-  .chat-msg { padding:8px 12px; border-radius:10px; max-width:85%; line-height:1.45; }
-  .chat-msg.user { align-self:flex-end; background: rgba(99,91,255,0.08); color: var(--text); }
-  .chat-msg.bot  { align-self:flex-start; background: var(--bg); color: var(--text); border:1px solid var(--border); }
-  .chat-msg .time { font-size:9px; color:var(--dim); margin-top:4px; }
-  .chat-input-wrap { display:flex; padding:10px; gap:8px; border-top:1px solid var(--border); }
-  .chat-input-wrap input {
-    flex:1; padding:8px 12px; border:1px solid var(--border); border-radius:20px;
-    font-size:13px; outline:none; background:var(--bg); color:var(--text);
-  }
-  .chat-input-wrap input:focus { border-color:var(--accent); }
-  .chat-input-wrap button {
-    padding:8px 14px; background:var(--accent); color:#fff; border:none;
-    border-radius:20px; font-size:12px; font-weight:600; cursor:pointer;
-  }
-  .chat-input-wrap button:hover { background:var(--accent-hv); }
-  .chat-typing { align-self:flex-start; padding:8px 12px; font-size:12px; color:var(--dim); display:none; }
-  .chat-typing.show { display:block; }
-
-  /* ── Provision Modal ── */
-  .modal-overlay {
-    display:none; position:fixed; top:0; left:0; right:0; bottom:0;
-    background:rgba(0,0,0,0.3); z-index:2000; align-items:center; justify-content:center;
-    backdrop-filter: blur(4px);
-  }
-  .modal-overlay.show { display:flex; }
-  .modal-box {
-    background: rgba(255,255,255,0.75); backdrop-filter: blur(24px) saturate(180%);
-    border: 1px solid rgba(255,255,255,0.5); border-radius: var(--radius-lg);
-    padding:24px; max-width:560px; width:90%; max-height:80vh; overflow-y:auto;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.6);
-  }
-  .modal-box h3 { font-size:16px; font-weight:700; margin-bottom:16px; }
-  .modal-svc {
-    background: rgba(255,255,255,0.5); backdrop-filter: blur(8px);
-    border: 1px solid rgba(255,255,255,0.4); border-radius: 12px;
-    padding:12px; margin-bottom:10px;
-  }
-  .modal-svc-name { font-weight:600; font-size:13px; margin-bottom:6px; color:var(--green); }
-  .modal-env {
-    font-family:'SF Mono','Fira Code',monospace; font-size:11px; color:var(--dim);
-    background:rgba(0,0,0,0.03); padding:8px 10px; border-radius:8px;
-    white-space:pre-wrap; word-break:break-all; max-height:120px; overflow-y:auto; margin-bottom:6px;
-  }
-  .modal-copy-btn {
-    padding:4px 12px; font-size:11px; font-weight:600; border:1px solid var(--border);
-    background:var(--surface); color:var(--text); border-radius:5px; cursor:pointer;
-  }
-  .modal-copy-btn:hover { background:var(--accent); color:#fff; border-color:var(--accent); }
-  .modal-actions {
-    display:flex; gap:8px; margin-top:16px; justify-content:space-between;
-  }
-  .modal-actions button {
-    padding:10px 20px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer;
-    border:none;
-  }
-  .btn-copyall { background:var(--accent); color:#fff; }
-  .btn-copyall:hover { background:var(--accent-hv); }
-  .btn-close { background:var(--border); color:var(--text); }
-  .btn-close:hover { background:var(--dim); color:#fff; }
+  .results-card{display:none}
+  .copy-btn{display:none}
+  .footer{text-align:center;margin-top:60px;font-size:10px;color:var(--dim);letter-spacing:1px;text-transform:uppercase}
+  .footer a{color:var(--text);text-decoration:none;font-weight:600}
+  .footer a:hover{color:var(--accent)}
 </style>
 </head>
 <body>
 <div class="container">
-  <!-- HERO -->
   <div class="hero">
-    <div class="tag">⚡ Hermes Agent + Stripe Projects</div>
+    <div class="tag">Hermes Agent × Stripe Projects</div>
     <h1>Stack-<em>in-a-Click</em></h1>
-    <p>Provision your entire SaaS stack in seconds. Select services, click deploy, get your <code>.env</code>.</p>
+    <p>Provision your entire SaaS stack in seconds. Select services, deploy, get your <code>.env</code>.</p>
     <p class="stats" id="catalog-meta"></p>
   </div>
 
-  <!-- SEARCH -->
   <div class="search-wrap">
-    <span class="s-icon">🔍</span>
-    <input id="search" placeholder="Search 57 services across 13 categories..." oninput="filter()">
+    <span class="s-icon">⌕</span>
+    <input id="search" placeholder="Search 57 services..." oninput="filter()">
     <span class="s-clear" id="s-clear" onclick="clearSearch()">✕</span>
   </div>
 
-  <!-- TEMPLATES -->
   <div class="tpl-section">
-    <div class="label">⚡ Quick-start templates</div>
+    <div class="label">Quick-Start Templates</div>
     <div class="tpl-grid" id="templates"></div>
   </div>
 
-  <!-- SERVICES -->
-  <div class="card">
-    <div id="categories"></div>
-  </div>
-
-  <!-- STATUS -->
+  <div class="card"><div id="categories"></div></div>
   <div class="status" id="status"></div>
+  <div class="results-card" id="results-card"></div>
 
-  <!-- CART -->
   <div class="cart" id="cart">
-    <div class="cart-header"><span class="cart-dot"></span> Cart · <span id="cart-count">0</span></div>
-    <div class="cart-body">
-      <div class="cart-list" id="cart-list"></div>
-    </div>
-    <div class="cart-footer">
-      <button class="btn-glass" id="cart-provision-btn" onclick="provision()">🚀 Provision</button>
-    </div>
-  </div>
+    <div class="cart-header">Cart · <span id="cart-count">0</span></div>
+    <div class="cart-list" id="cart-list"></div>
+    <div class="cart-footer"><button class="btn" id="cart-provision-btn" onclick="provision()">Provision</button></div>
   </div>
 
-  <div class="footer">
-    Built with <a href="https://hermes-agent.nousresearch.com" target="_blank">Hermes Agent</a>
-    · <a href="https://stripe.com" target="_blank">Stripe</a>
-    · <a href="https://nvidia.com" target="_blank">NVIDIA</a>
-    · Hackathon 2026
-  </div>
-
-  <!-- CHAT WIDGET -->
-  <button class="chat-bubble" id="chat-bubble" onclick="toggleChat()">💬</button>
-  <div class="chat-panel" id="chat-panel">
-    <div class="chat-panel-header">
-      🤖 Hermes Stack Assistant
-      <span style="flex:1"></span>
-      <span style="font-size:11px;opacity:0.8;cursor:pointer" onclick="newChat()">+ New</span>
-    </div>
-    <div class="chat-panel-messages" id="chat-messages">
-      <div class="chat-msg bot">Hey! 👋 What are you building? SaaS, AI agent, e-commerce?</div>
-    </div>
-    <div class="chat-typing" id="chat-typing">Thinking...</div>
-    <div class="chat-input-wrap">
-      <input id="chat-input" placeholder="What are you building?" onkeydown="if(event.key==='Enter')sendChat()">
-      <button onclick="sendChat()">Send</button>
-    </div>
-  </div>
-
-  <!-- PROVISION MODAL -->
   <div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
     <div class="modal-box">
-      <h3>✅ Services Provisioned</h3>
+      <h3>Services Provisioned</h3>
       <div id="modal-body"></div>
       <div class="modal-actions">
-        <button class="btn-copyall" id="modal-copy-all" onclick="copyAllEnv()">📋 Copy All .env</button>
-        <button class="btn-close" onclick="closeModal()">✕ Close</button>
+        <button class="btn-copyall" id="modal-copy-all" onclick="copyAllEnv()">Copy All .env</button>
+        <button class="btn-close" onclick="closeModal()">Close</button>
       </div>
       <pre id="modal-all-env" style="display:none"></pre>
     </div>
   </div>
+
+  <button class="chat-bubble" id="chat-bubble" onclick="toggleChat()">💬</button>
+  <div class="chat-panel" id="chat-panel">
+    <div class="chat-panel-header">Hermes Assistant <span onclick="newChat()">+ New</span></div>
+    <div class="chat-panel-messages" id="chat-messages">
+      <div class="chat-msg bot">Hey! What are you building?</div>
+    </div>
+    <div class="chat-typing" id="chat-typing">Thinking...</div>
+    <div class="chat-input-wrap">
+      <input id="chat-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendChat()">
+      <button onclick="sendChat()">Send</button>
+    </div>
+  </div>
+
+  <div class="footer">
+    Built with <a href="https://hermes-agent.nousresearch.com">Hermes Agent</a>
+    · <a href="https://stripe.com">Stripe</a>
+    · <a href="https://nvidia.com">NVIDIA</a>
+    · Hackathon 2026
+  </div>
 </div>
 
 <script>
-const API = window.location.origin;
-let catalog = null, selected = new Set(), activeTemplate = null;
-
-async function init() {
-  try {
-    const res = await fetch(`${API}/api/services`);
-    catalog = await res.json();
-    document.getElementById('catalog-meta').textContent =
-      `${catalog.total_services} services · ${Object.keys(catalog.categories).length} categories · ${Object.keys(catalog.templates).length} templates — updated ${catalog.updated}`;
-    renderTemplates(); renderCategories();
-  } catch(e) {
-    document.getElementById('categories').innerHTML = '<div style="padding:24px;color:var(--red)">Failed to load catalog.</div>';
-  }
-}
-
-function renderTemplates() {
-  document.getElementById('templates').innerHTML = Object.entries(catalog.templates).map(([id, t]) =>
-    `<div class="tpl-card" data-tpl="${id}" onclick="loadTemplate('${id}')">
-      <div class="t-name">${t.name}</div>
-      <div class="t-desc">${t.desc}</div>
-    </div>`
-  ).join('');
-}
-
-function loadTemplate(id) {
-  if (activeTemplate === id) {
-    // Toggle off: deselect all services from this template
-    activeTemplate = null;
-    catalog.templates[id].services.forEach(s => selected.delete(s));
-    document.querySelectorAll('.tpl-card').forEach(c => c.classList.remove('active'));
-  } else {
-    activeTemplate = id; selected.clear();
-    catalog.templates[id].services.forEach(s => selected.add(s));
-    document.querySelectorAll('.tpl-card').forEach(c => c.classList.toggle('active', c.dataset.tpl === id));
-  }
-  updateAll();
-}
-
-function renderCategories() {
-  document.getElementById('categories').innerHTML = Object.entries(catalog.categories).map(([cat, d]) =>
-    `<div class="cat" data-cat="${cat}">
-      <div class="cat-header open" onclick="toggleCat(this)">
-        <div class="c-left">
-          <span class="c-icon">${d.icon}</span>
-          <span class="c-name">${cat}</span>
-          <span class="c-badge">${d.services.length}</span>
-        </div>
-        <span class="c-arrow">▼</span>
-      </div>
-      <div class="cat-body show">
-        <div class="svc-grid">
-          ${d.services.map(s =>
-            `<div class="svc${selected.has(s.id)?' selected':''}" data-svc="${s.id}" onclick="toggleService('${s.id}',this)">
-              <div class="s-info">
-                <div class="s-name">${s.name}</div>
-                <div class="s-desc">${s.desc}</div>
-              </div>
-              <span class="s-tier tier-${s.tier}">${s.tier==='free'?'Free':s.tier==='mixed'?'Free+':'Paid'}</span>
-            </div>`
-          ).join('')}
-        </div>
-      </div>
-    </div>`
-  ).join('');
-}
-
-function toggleCat(h) { h.classList.toggle('open'); h.nextElementSibling.classList.toggle('show'); }
-function toggleService(id, el) {
-  selected.has(id) ? selected.delete(id) : selected.add(id);
-  el.classList.toggle('selected');
-  activeTemplate = null; document.querySelectorAll('.tpl-card').forEach(c=>c.classList.remove('active'));
-  updateCount();
-}
-function updateAll() {
-  document.querySelectorAll('.svc').forEach(el => el.classList.toggle('selected', selected.has(el.dataset.svc)));
-  updateCount();
-}
-function updateCount() { updateCart(); }
-function updateCart() {
-  const n = selected.size;
-  const cart = document.getElementById('cart');
-  document.getElementById('cart-count').textContent = n;
-  cart.classList.toggle('show', n > 0);
-  if (n === 0) return;
-
-  const items = [...selected].map(id => {
-    // Find category and name from catalog
-    let cat = '', name = id.split('/').pop();
-    if (catalog) {
-      for (const [cName, cData] of Object.entries(catalog.categories)) {
-        const svc = cData.services.find(s => s.id === id);
-        if (svc) { cat = cName; name = svc.name; break; }
-      }
-    }
-    return `<div class="cart-item">
-      <div class="ci-info"><div class="ci-name">${name}</div><div class="ci-cat">${cat}</div></div>
-      <span class="cart-item-remove" onclick="event.stopPropagation();removeFromCart('${id}')">✕</span>
-    </div>`;
-  }).join('');
-  document.getElementById('cart-list').innerHTML = items;
-}
-
-function removeFromCart(id) {
-  selected.delete(id);
-  document.querySelectorAll(`.svc[data-svc="${id}"]`).forEach(el => el.classList.remove('selected'));
-  activeTemplate = null;
-  document.querySelectorAll('.tpl-card').forEach(c=>c.classList.remove('active'));
-  updateCart();
-}
-function filter() {
-  const q = document.getElementById('search').value.toLowerCase();
-  document.getElementById('s-clear').classList.toggle('show', q.length > 0);
-  document.querySelectorAll('.cat').forEach(g => {
-    let vis = 0;
-    g.querySelectorAll('.svc').forEach(s => {
-      const t = (s.querySelector('.s-name').textContent + s.querySelector('.s-desc').textContent).toLowerCase();
-      const m = !q || t.includes(q); s.style.display = m ? '' : 'none'; if (m) vis++;
-    });
-    g.style.display = vis > 0 ? '' : 'none';
-  });
-}
-function clearSearch() { document.getElementById('search').value=''; filter(); }
-
-async function provision() {
-  if (!selected.size) return showStatus('Select at least one service!', 'error');
-  const btn = document.getElementById('cart-provision-btn'); btn.disabled = true;
-  showStatus('<span class="spinner"></span>Provisioning via Stripe Projects...', 'loading');
-  try {
-    const res = await fetch(`${API}/api/provision`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({providers:[...selected]}) });
-    const data = await res.json();
-    showModal(data);
-    showStatus(data.message, data.success?'success':'error');
-    selected.clear(); activeTemplate=null;
-    document.querySelectorAll('.tpl-card').forEach(c=>c.classList.remove('active'));
-    updateAll();
-  } catch(e) { showStatus('Connection error: '+e.message, 'error'); }
-  finally { btn.disabled = false; }
-}
-
-function showModal(data) {
-  const items = data.provisioned.map(r => {
-    const env = data.service_envs?.[r.provider] || '';
-    return `<div class="modal-svc">
-      <div class="modal-svc-name">✓ ${r.name || r.provider}</div>
-      <pre class="modal-env">${env}</pre>
-      <button class="modal-copy-btn" onclick="copyOne(this)">📋 Copy</button>
-    </div>`;
-  }).join('');
-
-  const allEnv = data.provisioned.map(r => data.service_envs?.[r.provider] || '').filter(Boolean).join('\n');
-
-  document.getElementById('modal-body').innerHTML = items;
-  document.getElementById('modal-all-env').textContent = allEnv;
-  document.getElementById('modal-overlay').classList.add('show');
-}
-
-function copyOne(btn) {
-  const env = btn.previousElementSibling.textContent;
-  navigator.clipboard.writeText(env).then(() => {
-    btn.textContent = '✓ Copied!';
-    setTimeout(() => btn.textContent = '📋 Copy', 2000);
-  });
-}
-
-function copyAllEnv() {
-  const env = document.getElementById('modal-all-env').textContent;
-  navigator.clipboard.writeText(env).then(() => {
-    const btn = document.getElementById('modal-copy-all');
-    btn.textContent = '✓ Copied!';
-    setTimeout(() => btn.textContent = '📋 Copy All .env', 2000);
-  });
-}
-
-function closeModal() {
-  document.getElementById('modal-overlay').classList.remove('show');
-}
-function showStatus(m,t) { const s=document.getElementById('status'); s.innerHTML=m; s.className='status show '+t; }
-
-// ── Chat Widget ──
-const CHAT_API = window.location.origin + '/api/chat';
-let chatHistory = [];
-
-function toggleChat() {
-  document.getElementById('chat-panel').classList.toggle('open');
-  document.getElementById('chat-bubble').textContent =
-    document.getElementById('chat-panel').classList.contains('open') ? '✕' : '💬';
-}
-
-function newChat() {
-  chatHistory = [];
-  document.getElementById('chat-messages').innerHTML =
-    '<div class="chat-msg bot">Hey! 👋 What are you building? SaaS, AI agent, e-commerce?</div>';
-}
-
-function addChatMsg(role, text) {
-  const msgs = document.getElementById('chat-messages');
-  const t = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-  msgs.innerHTML += `<div class="chat-msg ${role}">${text}<div class="time">${t}</div></div>`;
-  msgs.scrollTop = msgs.scrollHeight;
-}
-
-async function sendChat() {
-  const input = document.getElementById('chat-input');
-  const msg = input.value.trim();
-  if (!msg) return;
-  input.value = '';
-
-  addChatMsg('user', msg);
-  document.getElementById('chat-typing').classList.add('show');
-
-  try {
-    const res = await fetch(CHAT_API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: msg, history: chatHistory })
-    });
-    const data = await res.json();
-    document.getElementById('chat-typing').classList.remove('show');
-    addChatMsg('bot', data.message || 'Done!');
-    chatHistory.push({ role: 'user', content: msg }, { role: 'assistant', content: data.message });
-
-    // Apply actions to the page
-    if (data.action === 'select' && data.providers?.length) {
-      data.providers.forEach(id => selected.add(id));
-      updateAll();
-    } else if (data.action === 'deselect' && data.providers?.length) {
-      data.providers.forEach(id => selected.delete(id));
-      updateAll();
-    } else if (data.action === 'provision') {
-      provision();
-    }
-  } catch(e) {
-    document.getElementById('chat-typing').classList.remove('show');
-    addChatMsg('bot', '⚠️ Connection error. Chatbot is offline.');
-  }
-}
-
+const API=window.location.origin; let catalog=null,selected=new Set(),activeTemplate=null,chatHistory=[];
+async function init(){try{const r=await fetch(`${API}/api/services`);catalog=await r.json();document.getElementById('catalog-meta').textContent=`${catalog.total_services} Services · ${Object.keys(catalog.categories).length} Categories · ${Object.keys(catalog.templates).length} Templates`;renderTemplates();renderCategories()}catch(e){document.getElementById('categories').innerHTML='<p style="color:var(--red);padding:32px;text-align:center">Failed to load catalog.</p>'}}
+function renderTemplates(){document.getElementById('templates').innerHTML=Object.entries(catalog.templates).map(([id,t])=>`<div class="tpl-card" data-tpl="${id}" onclick="loadTemplate('${id}')"><div class="t-name">${t.name}</div><div class="t-desc">${t.desc}</div></div>`).join('')}
+function loadTemplate(id){if(activeTemplate===id){activeTemplate=null;catalog.templates[id].services.forEach(s=>selected.delete(s));document.querySelectorAll('.tpl-card').forEach(c=>c.classList.remove('active'))}else{activeTemplate=id;selected.clear();catalog.templates[id].services.forEach(s=>selected.add(s));document.querySelectorAll('.tpl-card').forEach(c=>c.classList.toggle('active',c.dataset.tpl===id))}updateAll()}
+function renderCategories(){document.getElementById('categories').innerHTML=Object.entries(catalog.categories).map(([cat,d])=>`<div class="cat" data-cat="${cat}"><div class="cat-header open" onclick="toggleCat(this)"><div class="c-left"><span class="c-icon">${d.icon}</span><span class="c-name">${cat}</span><span class="c-badge">${d.services.length}</span></div><span class="c-arrow">▼</span></div><div class="cat-body show"><div class="svc-grid">${d.services.map(s=>`<div class="svc${selected.has(s.id)?' selected':''}" data-svc="${s.id}" onclick="toggleService('${s.id}',this)"><div class="s-info"><div class="s-name">${s.name}</div><div class="s-desc">${s.desc}</div></div><span class="s-tier tier-${s.tier}">${s.tier==='free'?'Free':s.tier==='mixed'?'Free+':'Paid'}</span></div>`).join('')}</div></div></div>`).join('')}
+function toggleCat(h){h.classList.toggle('open');h.nextElementSibling.classList.toggle('show')}
+function toggleService(id,el){selected.has(id)?selected.delete(id):selected.add(id);el.classList.toggle('selected');activeTemplate=null;document.querySelectorAll('.tpl-card').forEach(c=>c.classList.remove('active'));updateCart()}
+function updateAll(){document.querySelectorAll('.svc').forEach(el=>el.classList.toggle('selected',selected.has(el.dataset.svc)));updateCart()}
+function updateCart(){const n=selected.size;document.getElementById('cart-count').textContent=n;document.getElementById('cart').classList.toggle('show',n>0);if(!n)return;const items=[...selected].map(id=>{let cat='',name=id.split('/').pop();if(catalog)for(const[cN,cD]of Object.entries(catalog.categories)){const svc=cD.services.find(s=>s.id===id);if(svc){cat=cN;name=svc.name;break}}return`<div class="cart-item"><div class="ci-info"><div class="ci-cat">${cat}</div><div class="ci-name">${name}</div></div><span class="cart-item-remove" onclick="event.stopPropagation();removeFromCart('${id}')">✕</span></div>`}).join('');document.getElementById('cart-list').innerHTML=items}
+function removeFromCart(id){selected.delete(id);document.querySelectorAll(`.svc[data-svc="${id}"]`).forEach(el=>el.classList.remove('selected'));activeTemplate=null;document.querySelectorAll('.tpl-card').forEach(c=>c.classList.remove('active'));updateCart()}
+function filter(){const q=document.getElementById('search').value.toLowerCase();document.getElementById('s-clear').classList.toggle('show',q.length>0);document.querySelectorAll('.cat').forEach(g=>{let vis=0;g.querySelectorAll('.svc').forEach(s=>{const t=(s.querySelector('.s-name').textContent+s.querySelector('.s-desc').textContent).toLowerCase();const m=!q||t.includes(q);s.style.display=m?'':'none';if(m)vis++});g.style.display=vis>0?'':'none'})}
+function clearSearch(){document.getElementById('search').value='';filter()}
+async function provision(){if(!selected.size)return showStatus('Select at least one service.','error');const btn=document.getElementById('cart-provision-btn');btn.disabled=true;showStatus('<span class="spinner"></span>Provisioning via Stripe Projects...','loading');try{const res=await fetch(`${API}/api/provision`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({providers:[...selected]})});const data=await res.json();showModal(data);showStatus(data.message,data.success?'success':'error');selected.clear();activeTemplate=null;document.querySelectorAll('.tpl-card').forEach(c=>c.classList.remove('active'));updateAll()}catch(e){showStatus('Connection error: '+e.message,'error')}finally{btn.disabled=false}}
+function showModal(data){const items=data.provisioned.map(r=>{const env=data.service_envs?.[r.provider]||'';return`<div class="modal-svc"><div class="modal-svc-name">${r.name||r.provider}</div><pre class="modal-env">${env}</pre><button class="modal-copy-btn" onclick="copyOne(this)">Copy</button></div>`}).join('');const allEnv=data.provisioned.map(r=>data.service_envs?.[r.provider]||'').filter(Boolean).join('\n');document.getElementById('modal-body').innerHTML=items;document.getElementById('modal-all-env').textContent=allEnv;document.getElementById('modal-overlay').classList.add('show')}
+function copyOne(btn){navigator.clipboard.writeText(btn.previousElementSibling.textContent).then(()=>{btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',2000)})}
+function copyAllEnv(){navigator.clipboard.writeText(document.getElementById('modal-all-env').textContent).then(()=>{const btn=document.getElementById('modal-copy-all');btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy All .env',2000)})}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('show')}
+function showStatus(m,t){const s=document.getElementById('status');s.innerHTML=m;s.className='status show '+t}
+function toggleChat(){document.getElementById('chat-panel').classList.toggle('open');document.getElementById('chat-bubble').textContent=document.getElementById('chat-panel').classList.contains('open')?'✕':'💬'}
+function newChat(){chatHistory=[];document.getElementById('chat-messages').innerHTML='<div class="chat-msg bot">Hey! What are you building?</div>'}
+function addChatMsg(role,text){const msgs=document.getElementById('chat-messages');const t=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});msgs.innerHTML+=`<div class="chat-msg ${role}">${text}<div class="time">${t}</div></div>`;msgs.scrollTop=msgs.scrollHeight}
+async function sendChat(){const input=document.getElementById('chat-input');const msg=input.value.trim();if(!msg)return;input.value='';addChatMsg('user',msg);document.getElementById('chat-typing').classList.add('show');try{const res=await fetch(`${API}/api/chat`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,history:chatHistory})});const data=await res.json();document.getElementById('chat-typing').classList.remove('show');addChatMsg('bot',data.message||'Done!');chatHistory.push({role:'user',content:msg},{role:'assistant',content:data.message});if(data.action==='select'&&data.providers?.length){data.providers.forEach(id=>selected.add(id));updateAll()}else if(data.action==='deselect'&&data.providers?.length){data.providers.forEach(id=>selected.delete(id));updateAll()}else if(data.action==='provision'){provision()}}catch(e){document.getElementById('chat-typing').classList.remove('show');addChatMsg('bot','Connection error.')}}
 init();
 </script>
 </body>
