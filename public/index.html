@@ -28,9 +28,9 @@
   .tpl-section{margin-bottom:24px}
   .tpl-section .label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--slate);margin-bottom:12px}
   .tpl-grid{display:flex;gap:8px;flex-wrap:wrap}
-  .tpl-chip{padding:8px 16px;border:2px solid var(--border-dark);border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;user-select:none;transition:all 0.15s;background:#fff;color:var(--navy);white-space:nowrap}
-  .tpl-chip:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.08)}
-  .tpl-chip.active{background:var(--green);border-color:var(--green);color:#fff;box-shadow:0 4px 16px rgba(34,197,94,0.3)}
+  .tpl-chip{padding:8px 16px;border:2px solid var(--border-dark);border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;user-select:none;transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1);background:#fff;color:var(--navy);white-space:nowrap}
+  .tpl-chip:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 4px 12px rgba(0,0,0,0.08)}
+  .tpl-chip.active{background:var(--green);border-color:var(--green);color:#fff;box-shadow:0 4px 16px rgba(34,197,94,0.3);transform:scale(1.05)}
 
   .card{background:#fff;border:2px solid var(--border-dark);border-radius:var(--radius);box-shadow:0 4px 16px rgba(0,0,0,0.06);overflow:hidden;margin-bottom:16px}
 
@@ -46,9 +46,9 @@
   .cat-body{display:none;padding:0 24px 16px}.cat-body.show{display:block}
 
   .svc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px}
-  .svc{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:12px;cursor:pointer;transition:all 0.1s;user-select:none;border:2px solid #f1f5f9;background:#fff}
-  .svc:hover{border-color:var(--blue);box-shadow:0 4px 12px rgba(0,0,0,0.04)}
-  .svc.selected{background:rgba(34,197,94,0.06);border-color:var(--green);box-shadow:0 4px 12px rgba(34,197,94,0.1)}
+  .svc{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:12px;cursor:pointer;transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1);user-select:none;border:2px solid #f1f5f9;background:#fff}
+  .svc:hover{border-color:var(--blue);box-shadow:0 4px 12px rgba(0,0,0,0.04);transform:translateY(-1px)}
+  .svc.selected{background:rgba(34,197,94,0.06);border-color:var(--green);box-shadow:0 4px 12px rgba(34,197,94,0.1);transform:scale(1.02)}
   .svc .s-info{flex:1;min-width:0}.svc .s-name{font-weight:700;font-size:13px}
   .svc .s-desc{font-size:11px;color:var(--slate);line-height:1.4;margin-top:2px}
   .svc .s-tier{font-size:9px;padding:3px 8px;border-radius:6px;font-weight:700;text-transform:uppercase;letter-spacing:.2px;white-space:nowrap;border:2px solid}
@@ -82,10 +82,11 @@
   .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--blue);border-top-color:var(--navy);border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;margin-right:8px}
   @keyframes spin{to{transform:rotate(360deg)}}
 
-  .cart{position:fixed;top:28px;right:28px;width:280px;background:#fff;border:2px solid var(--border-dark);border-radius:var(--radius);box-shadow:0 8px 24px rgba(0,0,0,0.12);z-index:1000;display:none}
-  .cart.show{display:block}
+  .cart{position:fixed;top:28px;right:28px;width:280px;background:#fff;border:2px solid var(--border-dark);border-radius:var(--radius);box-shadow:0 8px 24px rgba(0,0,0,0.12);z-index:1000;display:none;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);transform-origin:top right}
+  .cart.show{display:block;animation:popIn 0.3s cubic-bezier(0.34,1.56,0.64,1)}
   .cart.collapsed .cart-list,.cart.collapsed .cart-footer{display:none}
   .cart.collapsed{border-radius:14px;width:auto}
+  @keyframes popIn{from{opacity:0;transform:scale(0.9)}to{opacity:1;transform:scale(1)}}
   .cart-header{padding:14px 20px;font-size:14px;font-weight:800;background:linear-gradient(135deg,var(--green),#15803d);color:#fff;border-radius:14px 14px 0 0;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
   .cart.collapsed .cart-header{border-radius:12px}
   .cart-header .cart-collapse{margin-left:auto;background:rgba(255,255,255,0.2);border:none;color:#fff;width:24px;height:24px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;transition:background 0.15s}
@@ -117,8 +118,8 @@
   .chat-bubble{position:fixed;bottom:28px;right:28px;width:56px;height:56px;background:var(--green);border:2px solid #15803d;color:#fff;border-radius:18px;font-size:24px;cursor:pointer;z-index:998;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 0 #15803d;transition:all 0.15s}
   .chat-bubble:hover{transform:translateY(-2px);box-shadow:0 6px 0 #15803d}
   .chat-bubble:active{transform:translateY(2px);box-shadow:0 1px 0 #15803d}
-  .chat-panel{position:fixed;bottom:88px;right:28px;width:340px;max-height:440px;background:#fff;border:2px solid var(--border-dark);border-radius:var(--radius);box-shadow:0 12px 40px rgba(0,0,0,0.1);z-index:999;display:none;flex-direction:column}
-  .chat-panel.open{display:flex}
+  .chat-panel{position:fixed;bottom:88px;right:28px;width:340px;max-height:440px;background:#fff;border:2px solid var(--border-dark);border-radius:var(--radius);box-shadow:0 12px 40px rgba(0,0,0,0.1);z-index:999;display:none;flex-direction:column;transform-origin:bottom right}
+  .chat-panel.open{display:flex;animation:popIn 0.3s cubic-bezier(0.34,1.56,0.64,1)}
   .chat-panel-header{padding:14px 18px;font-size:13px;font-weight:800;border-bottom:2px solid #f1f5f9;display:flex;align-items:center;gap:8px}
   .chat-panel-header .dot{width:8px;height:8px;background:var(--green);border-radius:50%}
   .chat-panel-header .new-chat{margin-left:auto;font-size:11px;font-weight:700;color:var(--slate);cursor:pointer;transition:color 0.15s}.chat-panel-header .new-chat:hover{color:var(--navy)}
@@ -177,7 +178,7 @@
   <div class="cart" id="cart">
     <div class="cart-header" onclick="toggleCartCollapse()">🛒 Your Stack · <span id="cart-count">0</span><button class="cart-collapse" id="cart-collapse-btn" onclick="event.stopPropagation();toggleCartCollapse()">−</button></div>
     <div class="cart-list" id="cart-list"></div>
-    <div class="cart-footer"><button class="btn btn-green" id="cart-provision-btn" onclick="provision()">🚀 Provision</button></div>
+    <div class="cart-footer"><button class="btn btn-green" id="cart-provision-btn" onclick="provision()">🚀 Provision</button><button class="btn" style="width:100%;margin-top:6px;padding:8px;font-size:10px;box-shadow:0 2px 0 var(--border-dark)" onclick="removeAll()">🗑 Remove All</button></div>
   </div>
 
   <div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
@@ -219,7 +220,10 @@ function toggleService(id,el){selected.has(id)?selected.delete(id):selected.add(
 function updateAll(){document.querySelectorAll('.svc').forEach(el=>el.classList.toggle('selected',selected.has(el.dataset.svc)));updateCart()}
 function updateCart(){const n=selected.size;document.getElementById('cart-count').textContent=n;document.getElementById('cart').classList.toggle('show',n>0);if(!n)return;const items=[...selected].map(id=>{let cat='',name=id.split('/').pop(),tier='';if(catalog)for(const[cN,cD]of Object.entries(catalog.categories)){const svc=cD.services.find(s=>s.id===id);if(svc){cat=cN;name=svc.name;tier=svc.tier;break}}const tierLabel=tier==='free'?'Free':tier==='mixed'?'Free+':tier==='paid'?'Paid':'';return`<div class="cart-item"><div><div class="ci-cat">${cat}</div><div class="ci-name">${name} <span class="ci-tier tier-${tier}">${tierLabel}</span></div></div><span class="cart-item-remove" onclick="event.stopPropagation();removeFromCart('${id}')">✕</span></div>`}).join('');document.getElementById('cart-list').innerHTML=items}
 function removeFromCart(id){selected.delete(id);document.querySelectorAll(`.svc[data-svc="${id}"]`).forEach(el=>el.classList.remove('selected'));activeTemplates.clear();renderTemplates();updateCart()}
-function toggleCartCollapse(){const cart=document.getElementById('cart');const btn=document.getElementById('cart-collapse-btn');cart.classList.toggle('collapsed');btn.textContent=cart.classList.contains('collapsed')?'+':'−'}
+function toggleCartCollapse(){const cart=document.getElementById('cart');const btn=document.getElementById('cart-collapse-btn');const expanding=cart.classList.contains('collapsed');cart.classList.toggle('collapsed');btn.textContent=cart.classList.contains('collapsed')?'+':'−';if(expanding)closeChat()}
+function removeAll(){selected.clear();activeTemplates.clear();renderTemplates();updateAll()}
+function openChat(){document.getElementById('chat-panel').classList.add('open');document.getElementById('chat-bubble').textContent='✕';document.getElementById('cart').classList.add('collapsed');document.getElementById('cart-collapse-btn').textContent='+'}
+function closeChat(){document.getElementById('chat-panel').classList.remove('open');document.getElementById('chat-bubble').textContent='💬'}
 let activeFilter='all';
 
 function setFilter(f,el){activeFilter=f;document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');filter()}
@@ -232,7 +236,7 @@ function copyOne(btn){navigator.clipboard.writeText(btn.previousElementSibling.t
 function copyAllEnv(){navigator.clipboard.writeText(document.getElementById('modal-all-env').textContent).then(()=>{const btn=document.getElementById('modal-copy-all');btn.textContent='✓ Copied!';setTimeout(()=>btn.textContent='📋 Copy All .env',1500)})}
 function closeModal(){document.getElementById('modal-overlay').classList.remove('show')}
 function showStatus(m,t){const s=document.getElementById('status');s.innerHTML=m;s.className='status show '+t}
-function toggleChat(){document.getElementById('chat-panel').classList.toggle('open');document.getElementById('chat-bubble').textContent=document.getElementById('chat-panel').classList.contains('open')?'✕':'💬'}
+function toggleChat(){document.getElementById('chat-panel').classList.contains('open')?closeChat():openChat()}
 function newChat(){chatHistory=[];document.getElementById('chat-messages').innerHTML='<div class="chat-msg bot">Hey! What are you building today?</div>'}
 let pendingProviders=[];
 
@@ -244,7 +248,7 @@ function scrollChat(){const msgs=document.getElementById('chat-messages');msgs.s
 async function sendChat(){const input=document.getElementById('chat-input');const msg=input.value.trim();if(!msg)return;input.value='';addChatMsg('user',msg);document.getElementById('chat-typing').classList.add('show');try{const res=await fetch(`${API}/api/chat`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,history:chatHistory})});const data=await res.json();document.getElementById('chat-typing').classList.remove('show');addChatMsg('bot',data.message||'Done');chatHistory.push({role:'user',content:msg},{role:'assistant',content:data.message});if(data.action==='select'&&data.providers?.length){pendingProviders=data.providers}else if(data.action==='deselect'&&data.providers?.length){data.providers.forEach(id=>selected.delete(id));updateAll()}else if(data.action==='provision'){provision()}}catch(e){document.getElementById('chat-typing').classList.remove('show');addChatMsg('bot','Connection error.')}}
 init();
 // Auto-open chat on load
-setTimeout(()=>{document.getElementById('chat-panel').classList.add('open');document.getElementById('chat-bubble').textContent='✕'},800);
+setTimeout(()=>{openChat()},800);
 </script>
 </body>
 </html>
