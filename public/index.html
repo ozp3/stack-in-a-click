@@ -115,12 +115,32 @@
   .tier-mixed  { background: rgba(99,91,255,0.07); color: var(--accent); }
   .tier-paid   { background: rgba(229,69,69,0.07); color: var(--red); }
 
-  /* ── Action bar ── */
-  .action-bar {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 16px 20px; background: var(--surface); border-top: 1px solid var(--border);
-    border-radius: 0 0 var(--radius) var(--radius); margin-top: -1px;
+  /* ── Cart ── */
+  .cart {
+    position:fixed; bottom:88px; left:50%; transform:translateX(-50%);
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    box-shadow:0 4px 24px rgba(0,0,0,0.1); z-index:100; min-width:300px; max-width:500px;
+    display:none;
   }
+  .cart.show { display:block; }
+  .cart-header {
+    padding:10px 16px; cursor:pointer; display:flex; align-items:center; gap:8px;
+    font-size:13px; color:var(--text); user-select:none;
+  }
+  .cart-header:hover { background:rgba(99,91,255,0.02); }
+  .cart-arrow { font-size:10px; color:var(--dim); margin-left:auto; transition:transform 0.2s; }
+  .cart.open .cart-arrow { transform:rotate(180deg); }
+  .cart-body { display:none; padding:0 16px 12px; }
+  .cart.open .cart-body { display:block; }
+  .cart-list { max-height:200px; overflow-y:auto; margin-bottom:10px; }
+  .cart-item {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:6px 8px; font-size:13px; border-radius:6px;
+  }
+  .cart-item:hover { background:var(--bg); }
+  .cart-item-remove { color:var(--dim); cursor:pointer; font-size:16px; padding:0 4px; }
+  .cart-item-remove:hover { color:var(--red); }
+
   .btn {
     padding: 12px 28px; background: linear-gradient(135deg, var(--accent), #7c3aed);
     color: #fff; border: none; border-radius: var(--radius-sm); font-size: 14px;
@@ -128,8 +148,6 @@
   }
   .btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(99,91,255,0.3); }
   .btn:disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(30%); }
-  .selection-count { font-size: 13px; color: var(--dim); }
-  .selection-count strong { color: var(--accent); }
 
   /* ── Status / results ── */
   .status {
@@ -274,21 +292,22 @@
   <!-- SERVICES -->
   <div class="card">
     <div id="categories"></div>
-    <div class="action-bar">
-      <span class="selection-count" id="sel-count">No services selected</span>
-      <button class="btn" id="provision-btn" onclick="provision()">🚀 Provision</button>
-    </div>
   </div>
 
   <!-- STATUS -->
   <div class="status" id="status"></div>
 
-  <!-- RESULTS -->
-  <div class="results-card" id="results-card">
-    <h4>📦 Provisioning Result</h4>
-    <div id="result-list"></div>
-    <div id="env-output" style="display:none;"></div>
-    <button class="copy-btn" id="copy-btn" onclick="copyEnv()">📋 Copy .env</button>
+  <!-- CART -->
+  <div class="cart" id="cart">
+    <div class="cart-header" onclick="toggleCart()">
+      🛒 Cart · <strong id="cart-count">0</strong> services
+      <span class="cart-arrow">▼</span>
+    </div>
+    <div class="cart-body" id="cart-body">
+      <div class="cart-list" id="cart-list"></div>
+      <button class="btn" id="cart-provision-btn" onclick="provision()">🚀 Provision</button>
+    </div>
+  </div>
   </div>
 
   <div class="footer">
@@ -408,9 +427,33 @@ function updateAll() {
   document.querySelectorAll('.svc').forEach(el => el.classList.toggle('selected', selected.has(el.dataset.svc)));
   updateCount();
 }
-function updateCount() {
+function updateCount() { updateCart(); }
+function updateCart() {
   const n = selected.size;
-  document.getElementById('sel-count').innerHTML = n > 0 ? `<strong>${n}</strong> service${n>1?'s':''} selected` : 'No services selected';
+  const cart = document.getElementById('cart');
+  document.getElementById('cart-count').textContent = n;
+  cart.classList.toggle('show', n > 0);
+
+  if (n === 0) { cart.classList.remove('open'); return; }
+
+  // Build cart items
+  const items = [...selected].map(id => {
+    const name = id.split('/').pop();
+    return `<div class="cart-item"><span>✓ ${name}</span><span class="cart-item-remove" onclick="event.stopPropagation();removeFromCart('${id}')">✕</span></div>`;
+  }).join('');
+  document.getElementById('cart-list').innerHTML = items;
+}
+
+function removeFromCart(id) {
+  selected.delete(id);
+  document.querySelectorAll(`.svc[data-svc="${id}"]`).forEach(el => el.classList.remove('selected'));
+  activeTemplate = null;
+  document.querySelectorAll('.tpl-card').forEach(c=>c.classList.remove('active'));
+  updateCart();
+}
+
+function toggleCart() {
+  document.getElementById('cart').classList.toggle('open');
 }
 function filter() {
   const q = document.getElementById('search').value.toLowerCase();
@@ -428,7 +471,7 @@ function clearSearch() { document.getElementById('search').value=''; filter(); }
 
 async function provision() {
   if (!selected.size) return showStatus('Select at least one service!', 'error');
-  const btn = document.getElementById('provision-btn'); btn.disabled = true;
+  const btn = document.getElementById('cart-provision-btn'); btn.disabled = true;
   showStatus('<span class="spinner"></span>Provisioning via Stripe Projects...', 'loading');
   try {
     const res = await fetch(`${API}/api/provision`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({providers:[...selected]}) });
