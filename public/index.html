@@ -91,6 +91,10 @@
   .cart-item:last-child{border-bottom:none}
   .cart-item .ci-cat{font-size:10px;color:var(--slate);text-transform:uppercase;letter-spacing:.3px;font-weight:700}
   .cart-item .ci-name{font-weight:700;margin-top:3px;font-size:13px}
+  .ci-tier{font-size:8px;padding:1px 6px;border-radius:4px;font-weight:700;text-transform:uppercase;letter-spacing:.2px;margin-left:6px;vertical-align:middle;border:2px solid}
+  .ci-tier.tier-free{border-color:var(--green);color:var(--green)}
+  .ci-tier.tier-mixed{border-color:var(--accent-purple);color:var(--accent-purple)}
+  .ci-tier.tier-paid{border-color:var(--red);color:var(--red)}
   .cart-item-remove{color:var(--slate);cursor:pointer;font-size:15px;font-weight:700;opacity:0.3;transition:all 0.15s;width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:8px}.cart-item-remove:hover{opacity:1;color:#fff;background:var(--red)}
   .cart-footer{padding:14px 20px;background:#f8fafc;border-top:2px solid #f1f5f9;border-radius:0 0 14px 14px}
   .cart-footer .btn{width:100%}
@@ -150,7 +154,6 @@
     <span class="filter-chip mixed" data-filter="mixed" onclick="setFilter('mixed',this)">Free+</span>
     <span class="filter-chip paid" data-filter="paid" onclick="setFilter('paid',this)">Paid</span>
     <select class="sort-select" id="sort-select" onchange="sortServices()">
-      <option value="default">Sort: Default</option>
       <option value="az">A → Z</option>
       <option value="za">Z → A</option>
     </select>
@@ -207,7 +210,7 @@ function renderCategories(){document.getElementById('categories').innerHTML=Obje
 function toggleCat(h){h.classList.toggle('open');h.nextElementSibling.classList.toggle('show')}
 function toggleService(id,el){selected.has(id)?selected.delete(id):selected.add(id);el.classList.toggle('selected');activeTemplate=null;document.querySelectorAll('.tpl-chip').forEach(c=>c.classList.remove('active'));updateCart()}
 function updateAll(){document.querySelectorAll('.svc').forEach(el=>el.classList.toggle('selected',selected.has(el.dataset.svc)));updateCart()}
-function updateCart(){const n=selected.size;document.getElementById('cart-count').textContent=n;document.getElementById('cart').classList.toggle('show',n>0);if(!n)return;const items=[...selected].map(id=>{let cat='',name=id.split('/').pop();if(catalog)for(const[cN,cD]of Object.entries(catalog.categories)){const svc=cD.services.find(s=>s.id===id);if(svc){cat=cN;name=svc.name;break}}return`<div class="cart-item"><div><div class="ci-cat">${cat}</div><div class="ci-name">${name}</div></div><span class="cart-item-remove" onclick="event.stopPropagation();removeFromCart('${id}')">✕</span></div>`}).join('');document.getElementById('cart-list').innerHTML=items}
+function updateCart(){const n=selected.size;document.getElementById('cart-count').textContent=n;document.getElementById('cart').classList.toggle('show',n>0);if(!n)return;const items=[...selected].map(id=>{let cat='',name=id.split('/').pop(),tier='';if(catalog)for(const[cN,cD]of Object.entries(catalog.categories)){const svc=cD.services.find(s=>s.id===id);if(svc){cat=cN;name=svc.name;tier=svc.tier;break}}const tierLabel=tier==='free'?'Free':tier==='mixed'?'Free+':tier==='paid'?'Paid':'';return`<div class="cart-item"><div><div class="ci-cat">${cat}</div><div class="ci-name">${name} <span class="ci-tier tier-${tier}">${tierLabel}</span></div></div><span class="cart-item-remove" onclick="event.stopPropagation();removeFromCart('${id}')">✕</span></div>`}).join('');document.getElementById('cart-list').innerHTML=items}
 function removeFromCart(id){selected.delete(id);document.querySelectorAll(`.svc[data-svc="${id}"]`).forEach(el=>el.classList.remove('selected'));activeTemplate=null;document.querySelectorAll('.tpl-chip').forEach(c=>c.classList.remove('active'));updateCart()}
 let activeFilter='all';
 
