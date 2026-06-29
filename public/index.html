@@ -109,7 +109,7 @@
   .modal-copy-btn{font-size:11px;font-weight:700;border:none;background:none;color:var(--navy);cursor:pointer;padding:2px 0;opacity:0.6}.modal-copy-btn:hover{opacity:1;color:var(--green)}
   .modal-actions{display:flex;gap:8px;margin-top:20px}
 
-  .chat-bubble{position:fixed;bottom:28px;right:28px;width:48px;height:48px;background:var(--green);border:2px solid #15803d;color:#fff;border-radius:16px;font-size:20px;cursor:pointer;z-index:1000;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 0 #15803d;transition:all 0.15s}
+  .chat-bubble{position:fixed;bottom:28px;right:28px;width:56px;height:56px;background:var(--green);border:2px solid #15803d;color:#fff;border-radius:18px;font-size:24px;cursor:pointer;z-index:1000;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 0 #15803d;transition:all 0.15s}
   .chat-bubble:hover{transform:translateY(-2px);box-shadow:0 6px 0 #15803d}
   .chat-bubble:active{transform:translateY(2px);box-shadow:0 1px 0 #15803d}
   .chat-panel{position:fixed;bottom:88px;right:28px;width:340px;max-height:440px;background:#fff;border:2px solid var(--border-dark);border-radius:var(--radius);box-shadow:0 12px 40px rgba(0,0,0,0.1);z-index:999;display:none;flex-direction:column}
@@ -123,6 +123,8 @@
   .chat-msg.bot{align-self:flex-start;background:#fff;color:var(--navy);border-color:var(--border-dark);box-shadow:0 3px 0 var(--border-dark)}
   .chat-msg .time{font-size:9px;opacity:0.4;margin-top:4px;font-weight:500}
   .chat-typing{align-self:flex-start;padding:10px 14px;font-size:12px;color:var(--slate);font-weight:600;display:none}.chat-typing.show{display:block}
+  .chat-typing .dots span{animation:blink 1.4s infinite;font-size:18px;line-height:0}.chat-typing .dots span:nth-child(2){animation-delay:0.2s}.chat-typing .dots span:nth-child(3){animation-delay:0.4s}
+  @keyframes blink{0%,20%{opacity:0}50%{opacity:1}100%{opacity:0}}
   .chat-input-wrap{display:flex;padding:12px;gap:8px;border-top:2px solid #f1f5f9}
   .chat-input-wrap input{flex:1;padding:10px 14px;border:2px solid var(--border-dark);border-radius:12px;font-size:13px;outline:none;color:var(--navy);font-weight:500;transition:border-color 0.15s}
   .chat-input-wrap input:focus{border-color:var(--green)}
@@ -189,7 +191,7 @@
   <div class="chat-panel" id="chat-panel">
     <div class="chat-panel-header"><span class="dot"></span> Hermes Assistant <span class="new-chat" onclick="newChat()">+ New</span></div>
     <div class="chat-panel-messages" id="chat-messages"><div class="chat-msg bot">Hey! What are you building today?</div></div>
-    <div class="chat-typing" id="chat-typing">Thinking...</div>
+    <div class="chat-typing" id="chat-typing"><span class="dots"><span>.</span><span>.</span><span>.</span></span></div>
     <div class="chat-input-wrap">
       <input id="chat-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendChat()">
       <button onclick="sendChat()">Send</button>
@@ -229,6 +231,8 @@ function newChat(){chatHistory=[];document.getElementById('chat-messages').inner
 function addChatMsg(role,text){const msgs=document.getElementById('chat-messages');const t=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});msgs.innerHTML+=`<div class="chat-msg ${role}">${text}<div class="time">${t}</div></div>`;msgs.scrollTop=msgs.scrollHeight}
 async function sendChat(){const input=document.getElementById('chat-input');const msg=input.value.trim();if(!msg)return;input.value='';addChatMsg('user',msg);document.getElementById('chat-typing').classList.add('show');try{const res=await fetch(`${API}/api/chat`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,history:chatHistory})});const data=await res.json();document.getElementById('chat-typing').classList.remove('show');addChatMsg('bot',data.message||'Done');chatHistory.push({role:'user',content:msg},{role:'assistant',content:data.message});if(data.action==='select'&&data.providers?.length){data.providers.forEach(id=>selected.add(id));updateAll()}else if(data.action==='deselect'&&data.providers?.length){data.providers.forEach(id=>selected.delete(id));updateAll()}else if(data.action==='provision'){provision()}}catch(e){document.getElementById('chat-typing').classList.remove('show');addChatMsg('bot','Connection error.')}}
 init();
+// Auto-open chat on load
+setTimeout(()=>{document.getElementById('chat-panel').classList.add('open');document.getElementById('chat-bubble').textContent='✕'},800);
 </script>
 </body>
 </html>
