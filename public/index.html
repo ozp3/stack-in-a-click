@@ -19,7 +19,7 @@
   .hero .stats{font-size:12px;color:var(--slate);margin-top:10px}
 
   .search-wrap{position:relative;margin-bottom:24px}
-  .search-wrap input{width:100%;padding:14px 18px 14px 44px;border:2px solid var(--border-dark);border-radius:14px;font-size:14px;outline:none;background:#fff;color:var(--navy);transition:all 0.15s}
+  .search-wrap input{width:100%;padding:14px 18px 14px 44px;border:2px solid var(--border-dark);border-radius:14px;font-size:16px;outline:none;background:#fff;color:var(--navy);transition:all 0.15s}
   .search-wrap input:focus{border-color:var(--green);box-shadow:0 4px 16px rgba(34,197,94,0.1)}
   .search-wrap .s-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:15px}
   .search-wrap .s-clear{position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:15px;color:var(--slate);cursor:pointer;display:none}
@@ -82,7 +82,7 @@
   .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--blue);border-top-color:var(--navy);border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;margin-right:8px}
   @keyframes spin{to{transform:rotate(360deg)}}
 
-  .cart{position:fixed;top:28px;right:28px;width:280px;background:#fff;border:2px solid var(--border-dark);border-radius:var(--radius);box-shadow:0 8px 24px rgba(0,0,0,0.12);z-index:100;display:none}
+  .cart{position:fixed;top:28px;right:28px;width:280px;background:#fff;border:2px solid var(--border-dark);border-radius:var(--radius);box-shadow:0 8px 24px rgba(0,0,0,0.12);z-index:1000;display:none}
   .cart.show{display:block}
   .cart.collapsed .cart-list,.cart.collapsed .cart-footer{display:none}
   .cart.collapsed{border-radius:14px;width:auto}
@@ -114,7 +114,7 @@
   .modal-copy-btn{font-size:11px;font-weight:700;border:none;background:none;color:var(--navy);cursor:pointer;padding:2px 0;opacity:0.6}.modal-copy-btn:hover{opacity:1;color:var(--green)}
   .modal-actions{display:flex;gap:8px;margin-top:20px}
 
-  .chat-bubble{position:fixed;bottom:28px;right:28px;width:56px;height:56px;background:var(--green);border:2px solid #15803d;color:#fff;border-radius:18px;font-size:24px;cursor:pointer;z-index:1000;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 0 #15803d;transition:all 0.15s}
+  .chat-bubble{position:fixed;bottom:28px;right:28px;width:56px;height:56px;background:var(--green);border:2px solid #15803d;color:#fff;border-radius:18px;font-size:24px;cursor:pointer;z-index:998;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 0 #15803d;transition:all 0.15s}
   .chat-bubble:hover{transform:translateY(-2px);box-shadow:0 6px 0 #15803d}
   .chat-bubble:active{transform:translateY(2px);box-shadow:0 1px 0 #15803d}
   .chat-panel{position:fixed;bottom:88px;right:28px;width:340px;max-height:440px;background:#fff;border:2px solid var(--border-dark);border-radius:var(--radius);box-shadow:0 12px 40px rgba(0,0,0,0.1);z-index:999;display:none;flex-direction:column}
@@ -131,7 +131,7 @@
   .chat-typing .dots span{animation:blink 1.4s infinite;font-size:18px;line-height:0}.chat-typing .dots span:nth-child(2){animation-delay:0.2s}.chat-typing .dots span:nth-child(3){animation-delay:0.4s}
   @keyframes blink{0%,20%{opacity:0}50%{opacity:1}100%{opacity:0}}
   .chat-input-wrap{display:flex;padding:12px;gap:8px;border-top:2px solid #f1f5f9}
-  .chat-input-wrap input{flex:1;padding:10px 14px;border:2px solid var(--border-dark);border-radius:12px;font-size:13px;outline:none;color:var(--navy);font-weight:500;transition:border-color 0.15s}
+  .chat-input-wrap input{flex:1;padding:10px 14px;border:2px solid var(--border-dark);border-radius:12px;font-size:16px;outline:none;color:var(--navy);font-weight:500;transition:border-color 0.15s}
   .chat-input-wrap input:focus{border-color:var(--green)}
   .chat-input-wrap button{padding:10px 18px;background:var(--blue);border:2px solid #38bdf8;border-radius:12px;font-size:12px;font-weight:700;cursor:pointer;color:var(--navy);box-shadow:0 3px 0 #38bdf8;transition:all 0.15s}
   .chat-input-wrap button:hover{transform:translateY(-2px);box-shadow:0 5px 0 #38bdf8}
