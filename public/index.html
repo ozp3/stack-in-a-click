@@ -144,6 +144,9 @@
 
   .footer{text-align:center;margin-top:40px;font-size:11px;color:var(--slate);font-weight:600}
   .footer a{color:var(--navy);text-decoration:none;font-weight:700}.footer a:hover{color:var(--green)}
+
+  .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;padding:12px 24px;border-radius:14px;font-size:13px;font-weight:700;z-index:3000;opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.2)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
@@ -228,8 +231,9 @@ function updateCart(){const n=selected.size;document.getElementById('cart-count'
 function removeFromCart(id){selected.delete(id);document.querySelectorAll(`.svc[data-svc="${id}"]`).forEach(el=>el.classList.remove('selected'));activeTemplates.clear();renderTemplates();updateCart()}
 function toggleCartCollapse(){const cart=document.getElementById('cart');const btn=document.getElementById('cart-collapse-btn');const expanding=cart.classList.contains('collapsed');cart.classList.toggle('collapsed');btn.textContent=cart.classList.contains('collapsed')?'+':'−';if(expanding)closeChat()}
 function removeAll(){if(selected.size===0)return;if(!document.getElementById('remove-confirm')){const cart=document.getElementById('cart-list');cart.insertAdjacentHTML('beforeend','<div id="remove-confirm" style="padding:8px 20px;text-align:center;border-top:2px solid #f1f5f9"><div style="font-size:11px;font-weight:700;margin-bottom:8px">Remove all services?</div><button class="btn" style="padding:6px 14px;font-size:10px;box-shadow:0 2px 0 var(--border-dark);margin-right:6px;color:var(--red)" onclick="confirmRemoveAll()">✓ Yes</button><button class="btn" style="padding:6px 14px;font-size:10px;box-shadow:0 2px 0 var(--border-dark)" onclick="cancelRemoveAll()">✕ No</button></div>');cart.scrollTop=cart.scrollHeight;return}confirmRemoveAll()}
-function confirmRemoveAll(){const el=document.getElementById('remove-confirm');if(el)el.remove();selected.clear();activeTemplates.clear();renderTemplates();updateAll()}
+function confirmRemoveAll(){const el=document.getElementById('remove-confirm');if(el)el.remove();selected.clear();activeTemplates.clear();renderTemplates();updateAll();showToast('🗑 All services removed from cart')}
 function cancelRemoveAll(){const el=document.getElementById('remove-confirm');if(el)el.remove()}
+function showToast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);requestAnimationFrame(()=>t.classList.add('show'));setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),400)},2000)}
 function openChat(){document.getElementById('chat-panel').classList.add('open');document.getElementById('chat-bubble').textContent='✕';document.getElementById('cart').classList.add('collapsed');document.getElementById('cart-collapse-btn').textContent='+'}
 function closeChat(){document.getElementById('chat-panel').classList.remove('open');document.getElementById('chat-bubble').textContent='💬'}
 let activeFilter='all';
