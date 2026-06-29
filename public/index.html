@@ -6,14 +6,14 @@
 <title>Stack-in-a-Click — Hermes Agent</title>
 <style>
   :root {
-    --bg: #0a0a0f;
-    --card: #131320;
-    --border: #1e1e35;
+    --bg: #f8f9fc;
+    --card: #ffffff;
+    --border: #e2e4eb;
     --accent: #635bff;
-    --accent-glow: #8b83ff;
-    --green: #00d4aa;
-    --text: #e4e4f0;
-    --dim: #6b6b80;
+    --accent-glow: #7c3aed;
+    --green: #00a878;
+    --text: #1a1a2e;
+    --dim: #8b8da0;
     --radius: 12px;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -64,16 +64,16 @@
     align-items: center;
     gap: 12px;
     padding: 14px 16px;
-    background: rgba(255,255,255,0.02);
+    background: #f8f9fc;
     border: 1px solid var(--border);
     border-radius: 10px;
     cursor: pointer;
     transition: all 0.2s;
     user-select: none;
   }
-  .service:hover { border-color: var(--accent); background: rgba(99,91,255,0.05); }
-  .service.selected { border-color: var(--accent); background: rgba(99,91,255,0.08); box-shadow: 0 0 20px rgba(99,91,255,0.1); }
-  .service .icon { font-size: 22px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); border-radius: 8px; }
+  .service:hover { border-color: var(--accent); background: rgba(99,91,255,0.04); }
+  .service.selected { border-color: var(--accent); background: rgba(99,91,255,0.06); box-shadow: 0 0 20px rgba(99,91,255,0.08); }
+  .service .icon { font-size: 22px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: #eef0f6; border-radius: 8px; }
   .service .info { flex: 1; }
   .service .info .name { font-weight: 600; font-size: 15px; }
   .service .info .desc { font-size: 12px; color: var(--dim); margin-top: 2px; }
@@ -83,8 +83,8 @@
     border-radius: 6px;
     font-weight: 500;
   }
-  .tier.free { background: rgba(0,212,170,0.12); color: var(--green); }
-  .tier.payg { background: rgba(255,255,255,0.06); color: var(--dim); }
+  .tier.free { background: rgba(0,168,120,0.1); color: var(--green); }
+  .tier.payg { background: #eef0f6; color: var(--dim); }
 
   /* Button */
   .btn {
@@ -123,13 +123,13 @@
 
   /* Env output */
   .env-output {
-    background: #0a0a12;
+    background: #f1f2f6;
     border: 1px solid var(--border);
     border-radius: 8px;
     padding: 16px;
     font-family: 'SF Mono', 'Fira Code', monospace;
     font-size: 12px;
-    color: var(--green);
+    color: #1a6e4a;
     white-space: pre-wrap;
     word-break: break-all;
     max-height: 300px;
@@ -268,13 +268,13 @@ async function provision() {
       resultList.innerHTML += `<div class="result-item"><span class="fail">✗</span> ${r.icon} ${r.name}: ${r.error}</div>`;
     });
 
-    // Show .env
+    // Store .env for copying (don't display it)
     const envDiv = document.getElementById('env-output');
     const copyBtn = document.getElementById('copy-btn');
     if (data.env && data.env.trim()) {
       envDiv.textContent = data.env;
-      envDiv.classList.add('show');
       copyBtn.style.display = 'inline-block';
+      copyBtn.textContent = '📋 .env\'i Kopyala';
     }
 
     showStatus(data.message, data.success ? 'success' : 'error');
