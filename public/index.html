@@ -117,29 +117,28 @@
 
   /* ── Cart ── */
   .cart {
-    position:fixed; bottom:88px; left:50%; transform:translateX(-50%);
-    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
-    box-shadow:0 4px 24px rgba(0,0,0,0.1); z-index:100; min-width:300px; max-width:500px;
-    display:none;
+    position:fixed; top:100px; right:24px; width:280px;
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
+    box-shadow:0 4px 24px rgba(0,0,0,0.08); z-index:100; display:none;
   }
   .cart.show { display:block; }
   .cart-header {
-    padding:10px 16px; cursor:pointer; display:flex; align-items:center; gap:8px;
-    font-size:13px; color:var(--text); user-select:none;
+    padding:12px 16px; font-size:13px; font-weight:700; color:var(--text);
+    border-bottom:1px solid var(--border); display:flex; align-items:center; gap:6px;
   }
-  .cart-header:hover { background:rgba(99,91,255,0.02); }
-  .cart-arrow { font-size:10px; color:var(--dim); margin-left:auto; transition:transform 0.2s; }
-  .cart.open .cart-arrow { transform:rotate(180deg); }
-  .cart-body { display:none; padding:0 16px 12px; }
-  .cart.open .cart-body { display:block; }
-  .cart-list { max-height:200px; overflow-y:auto; margin-bottom:10px; }
+  .cart-body { padding:8px 0; }
+  .cart-list { max-height:320px; overflow-y:auto; }
   .cart-item {
     display:flex; align-items:center; justify-content:space-between;
-    padding:6px 8px; font-size:13px; border-radius:6px;
+    padding:8px 16px; font-size:13px;
   }
   .cart-item:hover { background:var(--bg); }
-  .cart-item-remove { color:var(--dim); cursor:pointer; font-size:16px; padding:0 4px; }
+  .cart-item .ci-info { flex:1; min-width:0; }
+  .cart-item .ci-name { font-weight:600; }
+  .cart-item .ci-cat { font-size:11px; color:var(--dim); }
+  .cart-item-remove { color:var(--dim); cursor:pointer; font-size:15px; padding:2px 6px; }
   .cart-item-remove:hover { color:var(--red); }
+  .cart-footer { padding:10px 16px; border-top:1px solid var(--border); }
 
   .btn {
     padding: 12px 28px; background: linear-gradient(135deg, var(--accent), #7c3aed);
@@ -299,13 +298,12 @@
 
   <!-- CART -->
   <div class="cart" id="cart">
-    <div class="cart-header" onclick="toggleCart()">
-      🛒 Cart · <strong id="cart-count">0</strong> services
-      <span class="cart-arrow">▼</span>
-    </div>
-    <div class="cart-body" id="cart-body">
+    <div class="cart-header">🛒 Cart · <span id="cart-count">0</span></div>
+    <div class="cart-body">
       <div class="cart-list" id="cart-list"></div>
-      <button class="btn" id="cart-provision-btn" onclick="provision()">🚀 Provision</button>
+    </div>
+    <div class="cart-footer">
+      <button class="btn" id="cart-provision-btn" onclick="provision()" style="width:100%;padding:10px;font-size:13px">🚀 Provision</button>
     </div>
   </div>
   </div>
@@ -433,13 +431,21 @@ function updateCart() {
   const cart = document.getElementById('cart');
   document.getElementById('cart-count').textContent = n;
   cart.classList.toggle('show', n > 0);
+  if (n === 0) return;
 
-  if (n === 0) { cart.classList.remove('open'); return; }
-
-  // Build cart items
   const items = [...selected].map(id => {
-    const name = id.split('/').pop();
-    return `<div class="cart-item"><span>✓ ${name}</span><span class="cart-item-remove" onclick="event.stopPropagation();removeFromCart('${id}')">✕</span></div>`;
+    // Find category and name from catalog
+    let cat = '', name = id.split('/').pop();
+    if (catalog) {
+      for (const [cName, cData] of Object.entries(catalog.categories)) {
+        const svc = cData.services.find(s => s.id === id);
+        if (svc) { cat = cName; name = svc.name; break; }
+      }
+    }
+    return `<div class="cart-item">
+      <div class="ci-info"><div class="ci-name">${name}</div><div class="ci-cat">${cat}</div></div>
+      <span class="cart-item-remove" onclick="event.stopPropagation();removeFromCart('${id}')">✕</span>
+    </div>`;
   }).join('');
   document.getElementById('cart-list').innerHTML = items;
 }
@@ -450,10 +456,6 @@ function removeFromCart(id) {
   activeTemplate = null;
   document.querySelectorAll('.tpl-card').forEach(c=>c.classList.remove('active'));
   updateCart();
-}
-
-function toggleCart() {
-  document.getElementById('cart').classList.toggle('open');
 }
 function filter() {
   const q = document.getElementById('search').value.toLowerCase();
