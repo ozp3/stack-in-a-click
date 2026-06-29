@@ -61,7 +61,7 @@ export default async function handler(req, res) {
   if (!message?.trim()) return res.status(400).json({ error: 'Empty message' });
 
   if (!DEEPSEEK_KEY) {
-    return res.json({ action: 'chat', providers: [], message: 'Chatbot offline — API key not configured.' });
+    return res.json({ action: 'chat', providers: [], message: 'Chatbot is offline — API key not configured.' });
   }
 
   try {

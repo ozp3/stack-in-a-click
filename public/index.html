@@ -263,12 +263,12 @@
   <div class="chat-panel" id="chat-panel">
     <div class="chat-panel-header">🤖 Hermes Stack Assistant</div>
     <div class="chat-panel-messages" id="chat-messages">
-      <div class="chat-msg bot">Merhaba! 👋 Ne tür bir proje kurmak istersin? SaaS, AI agent, e-ticaret?</div>
+      <div class="chat-msg bot">Hey! 👋 What are you building? SaaS, AI agent, e-commerce?</div>
     </div>
-    <div class="chat-typing" id="chat-typing">Düşünüyor...</div>
+    <div class="chat-typing" id="chat-typing">Thinking...</div>
     <div class="chat-input-wrap">
-      <input id="chat-input" placeholder="Ne kurmak istersin?" onkeydown="if(event.key==='Enter')sendChat()">
-      <button onclick="sendChat()">Gönder</button>
+      <input id="chat-input" placeholder="What are you building?" onkeydown="if(event.key==='Enter')sendChat()">
+      <button onclick="sendChat()">Send</button>
     </div>
   </div>
 </div>
@@ -443,7 +443,7 @@ async function sendChat() {
     }
   } catch(e) {
     document.getElementById('chat-typing').classList.remove('show');
-    addChatMsg('bot', '⚠️ Bağlantı hatası. Chatbot şu an çevrimdışı.');
+    addChatMsg('bot', '⚠️ Connection error. Chatbot is offline.');
   }
 }
 

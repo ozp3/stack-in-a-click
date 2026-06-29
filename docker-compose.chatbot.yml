@@ -1,0 +1,21 @@
+services:
+  hermes-chatbot:
+    build:
+      context: .
+      dockerfile: Dockerfile.chatbot
+    container_name: hermes-chatbot
+    ports:
+      - "127.0.0.1:3001:3001"
+    environment:
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
+      - PORT=3001
+    restart: unless-stopped
+    # NO volume mounts to r580 — container is isolated
+    # Only mounts are the Node modules inside the image
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL

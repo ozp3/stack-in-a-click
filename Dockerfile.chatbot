@@ -1,0 +1,16 @@
+FROM node:22-slim
+
+WORKDIR /app
+
+# Only copy what's needed
+COPY chatbot/package.json chatbot/package-lock.json* ./
+RUN npm install --production 2>/dev/null || npm install
+
+COPY chatbot/server.js ./
+COPY chatbot/system-prompt.txt ./
+COPY chatbot/catalog.json ./
+
+EXPOSE 3001
+
+USER node
+CMD ["node", "server.js"]
