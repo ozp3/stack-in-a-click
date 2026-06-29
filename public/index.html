@@ -84,8 +84,9 @@
 
   .cart{position:fixed;top:28px;right:28px;width:280px;background:#fff;border:2px solid var(--border-dark);border-radius:var(--radius);box-shadow:0 8px 24px rgba(0,0,0,0.12);z-index:1000;display:none;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);transform-origin:top right}
   .cart.show{display:block;animation:popIn 0.3s cubic-bezier(0.34,1.56,0.64,1)}
-  .cart.collapsed .cart-list{max-height:0;opacity:0;overflow:hidden;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1)}
-  .cart.collapsed .cart-footer{max-height:0;opacity:0;overflow:hidden;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1)}
+  .cart.collapsed .cart-list{max-height:0;opacity:0;padding:0;margin:0;overflow:hidden;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1)}
+  .cart.collapsed .cart-footer{max-height:0;opacity:0;padding:0;margin:0;overflow:hidden;border-top:none;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1)}
+  .cart.collapsed .cart-body{padding:0}
   .cart .cart-list{max-height:300px;opacity:1;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1)}
   .cart .cart-footer{max-height:120px;opacity:1;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1)}
   .cart.collapsed{border-radius:14px;width:auto}
