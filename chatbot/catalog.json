@@ -1,0 +1,469 @@
+{
+  "updated": "2026-06-29",
+  "total_services": 57,
+  "total_providers": 39,
+  "categories": {
+    "Hosting": {
+      "icon": "\u25b2",
+      "services": [
+        {
+          "id": "base44_projects/app",
+          "name": "Base44 App",
+          "desc": "AI services, hosting, database and auth in one",
+          "tier": "free"
+        },
+        {
+          "id": "blaxel/agent-drive",
+          "name": "Blaxel Agent Drive",
+          "desc": "Shared filesystem for AI agents",
+          "tier": "free"
+        },
+        {
+          "id": "blaxel/sandbox",
+          "name": "Blaxel Sandbox",
+          "desc": "Secure sandboxes that suspend when idle",
+          "tier": "free"
+        },
+        {
+          "id": "cloudflare/workers",
+          "name": "Cloudflare Workers",
+          "desc": "Serverless apps and APIs across the globe",
+          "tier": "free"
+        },
+        {
+          "id": "gitlab/project",
+          "name": "GitLab Project",
+          "desc": "Built-in CI/CD, container registry, Git hosting",
+          "tier": "free"
+        },
+        {
+          "id": "huggingface/platform",
+          "name": "Hugging Face",
+          "desc": "Models, datasets, Spaces \u2014 full HF platform",
+          "tier": "mixed"
+        },
+        {
+          "id": "netlify/project",
+          "name": "Netlify",
+          "desc": "Hosted website backed by global CDN",
+          "tier": "free"
+        },
+        {
+          "id": "railway/hosting",
+          "name": "Railway Hosting",
+          "desc": "Deploy repos or Dockerfiles instantly",
+          "tier": "free"
+        },
+        {
+          "id": "render/static-site",
+          "name": "Render Static",
+          "desc": "Free static site hosting with global CDN",
+          "tier": "free"
+        },
+        {
+          "id": "render/web-service",
+          "name": "Render Web Service",
+          "desc": "Managed web service with instance-based pricing",
+          "tier": "mixed"
+        },
+        {
+          "id": "vercel/project",
+          "name": "Vercel",
+          "desc": "Deploy from Git with automatic previews",
+          "tier": "mixed"
+        },
+        {
+          "id": "wordpress.com/site",
+          "name": "WordPress.com",
+          "desc": "Fully-managed WordPress with unlimited pages",
+          "tier": "mixed"
+        }
+      ]
+    },
+    "Database": {
+      "icon": "\ud83d\uddc4\ufe0f",
+      "services": [
+        {
+          "id": "clickhouse/postgres",
+          "name": "ClickHouse Postgres",
+          "desc": "Production-grade managed Postgres Scale",
+          "tier": "free"
+        },
+        {
+          "id": "cloudflare/d1",
+          "name": "Cloudflare D1",
+          "desc": "Serverless SQLite \u2014 no cold starts",
+          "tier": "free"
+        },
+        {
+          "id": "cloudflare/hyperdrive",
+          "name": "Hyperdrive",
+          "desc": "Connect Workers to existing Postgres/MySQL",
+          "tier": "free"
+        },
+        {
+          "id": "flyio/mpg",
+          "name": "Fly.io Postgres",
+          "desc": "High-availability managed PostgreSQL clusters",
+          "tier": "paid"
+        },
+        {
+          "id": "neon/postgres",
+          "name": "Neon Postgres",
+          "desc": "Serverless Postgres with built-in auth",
+          "tier": "free"
+        },
+        {
+          "id": "planetscale/mysql",
+          "name": "PlanetScale MySQL",
+          "desc": "Fully managed MySQL",
+          "tier": "paid"
+        },
+        {
+          "id": "planetscale/postgresql",
+          "name": "PlanetScale Postgres",
+          "desc": "Fully managed Postgres on PlanetScale",
+          "tier": "paid"
+        },
+        {
+          "id": "prisma/database",
+          "name": "Prisma Postgres",
+          "desc": "Managed Postgres optimized for Prisma ORM",
+          "tier": "mixed"
+        },
+        {
+          "id": "railway/mongo",
+          "name": "Railway MongoDB",
+          "desc": "Managed MongoDB on Railway",
+          "tier": "free"
+        },
+        {
+          "id": "railway/postgres",
+          "name": "Railway Postgres",
+          "desc": "Managed PostgreSQL on Railway",
+          "tier": "free"
+        },
+        {
+          "id": "railway/redis",
+          "name": "Railway Redis",
+          "desc": "Managed Redis cache on Railway",
+          "tier": "free"
+        },
+        {
+          "id": "render/postgres",
+          "name": "Render Postgres",
+          "desc": "Managed PostgreSQL with instance pricing",
+          "tier": "mixed"
+        },
+        {
+          "id": "supabase/project",
+          "name": "Supabase",
+          "desc": "Database, auth, and storage in one project",
+          "tier": "free"
+        },
+        {
+          "id": "turso/database",
+          "name": "Turso",
+          "desc": "SQLite-based, always-on edge database",
+          "tier": "mixed"
+        },
+        {
+          "id": "upstash/redis",
+          "name": "Upstash Redis",
+          "desc": "Serverless Redis with global replication",
+          "tier": "mixed"
+        },
+        {
+          "id": "upstash/vector",
+          "name": "Upstash Vector",
+          "desc": "Serverless vector database for AI",
+          "tier": "mixed"
+        }
+      ]
+    },
+    "AI & ML": {
+      "icon": "\ud83e\udd16",
+      "services": [
+        {
+          "id": "algolia/application",
+          "name": "Algolia Search",
+          "desc": "Search & Discovery API with AI",
+          "tier": "mixed"
+        },
+        {
+          "id": "cloudflare/workers-ai",
+          "name": "Workers AI",
+          "desc": "Run AI models on serverless GPUs",
+          "tier": "free"
+        },
+        {
+          "id": "elevenlabs/tts",
+          "name": "ElevenLabs TTS",
+          "desc": "Text-to-Speech with natural voices",
+          "tier": "free"
+        },
+        {
+          "id": "exa/api",
+          "name": "Exa Search",
+          "desc": "Fastest web search API for AI agents",
+          "tier": "free"
+        },
+        {
+          "id": "firecrawl/api",
+          "name": "Firecrawl",
+          "desc": "Search, scrape, and extract the web",
+          "tier": "free"
+        },
+        {
+          "id": "huggingface/bucket",
+          "name": "HF Storage Bucket",
+          "desc": "Storage bucket for your data and models",
+          "tier": "mixed"
+        },
+        {
+          "id": "kernel/project",
+          "name": "Kernel",
+          "desc": "Cloud browsing + model access platform",
+          "tier": "mixed"
+        },
+        {
+          "id": "openrouter/api",
+          "name": "OpenRouter",
+          "desc": "400+ AI models via one API",
+          "tier": "mixed"
+        },
+        {
+          "id": "supermemory/memory",
+          "name": "Supermemory",
+          "desc": "Memory for AI agents \u2014 RAG, file system",
+          "tier": "mixed"
+        }
+      ]
+    },
+    "Analytics": {
+      "icon": "\ud83d\udcca",
+      "services": [
+        {
+          "id": "amplitude/analytics",
+          "name": "Amplitude",
+          "desc": "Product analytics and feature flags",
+          "tier": "free"
+        },
+        {
+          "id": "mixpanel/analytics",
+          "name": "Mixpanel",
+          "desc": "Product analytics for builders",
+          "tier": "free"
+        },
+        {
+          "id": "posthog/analytics",
+          "name": "PostHog",
+          "desc": "Analytics, session replay, feature flags",
+          "tier": "free"
+        }
+      ]
+    },
+    "Auth": {
+      "icon": "\ud83d\udd10",
+      "services": [
+        {
+          "id": "auth0/client",
+          "name": "Auth0",
+          "desc": "Drop-in auth for mobile, web, IoT",
+          "tier": "mixed"
+        },
+        {
+          "id": "clerk/auth",
+          "name": "Clerk",
+          "desc": "Drop-in auth for any framework",
+          "tier": "mixed"
+        },
+        {
+          "id": "privy/app",
+          "name": "Privy",
+          "desc": "Auth + wallet for your app",
+          "tier": "mixed"
+        },
+        {
+          "id": "workos/auth",
+          "name": "WorkOS",
+          "desc": "SSO, MFA, enterprise auth",
+          "tier": "mixed"
+        }
+      ]
+    },
+    "Communication": {
+      "icon": "\ud83d\udcac",
+      "services": [
+        {
+          "id": "agentmail/api",
+          "name": "AgentMail",
+          "desc": "Create inboxes to send/receive email",
+          "tier": "mixed"
+        },
+        {
+          "id": "postalform/mail",
+          "name": "PostalForm",
+          "desc": "Agentic postal mail \u2014 upload PDFs, send",
+          "tier": "mixed"
+        },
+        {
+          "id": "upstash/qstash",
+          "name": "QStash",
+          "desc": "Serverless message queue and scheduler",
+          "tier": "mixed"
+        }
+      ]
+    },
+    "Queue": {
+      "icon": "\u26a1",
+      "services": [
+        {
+          "id": "cloudflare/queues",
+          "name": "Cloudflare Queues",
+          "desc": "Guaranteed delivery message queue",
+          "tier": "free"
+        },
+        {
+          "id": "inngest/app",
+          "name": "Inngest",
+          "desc": "Reliable production workflows and queues",
+          "tier": "mixed"
+        }
+      ]
+    },
+    "Browser": {
+      "icon": "\ud83c\udf10",
+      "services": [
+        {
+          "id": "browserbase/project",
+          "name": "Browserbase",
+          "desc": "Managed cloud browsers for Playwright",
+          "tier": "mixed"
+        },
+        {
+          "id": "cloudflare/browser-run",
+          "name": "Browser Rendering",
+          "desc": "Headless browsers on Cloudflare",
+          "tier": "free"
+        }
+      ]
+    },
+    "Search": {
+      "icon": "\ud83d\udd0d",
+      "services": [
+        {
+          "id": "upstash/search",
+          "name": "Upstash Search",
+          "desc": "Full-text + semantic search with RAG",
+          "tier": "mixed"
+        }
+      ]
+    },
+    "Storage": {
+      "icon": "\ud83d\udcbe",
+      "services": [
+        {
+          "id": "cloudflare/kv",
+          "name": "Cloudflare KV",
+          "desc": "Global low-latency key-value store",
+          "tier": "free"
+        },
+        {
+          "id": "railway/bucket",
+          "name": "Railway Bucket",
+          "desc": "S3-compatible object storage",
+          "tier": "free"
+        }
+      ]
+    },
+    "Observability": {
+      "icon": "\ud83d\udc41\ufe0f",
+      "services": [
+        {
+          "id": "sentry/project",
+          "name": "Sentry",
+          "desc": "Error tracking and performance monitoring",
+          "tier": "free"
+        }
+      ]
+    },
+    "E-Commerce": {
+      "icon": "\ud83d\uded2",
+      "services": [
+        {
+          "id": "wix/headless",
+          "name": "Wix Headless",
+          "desc": "Headless e-commerce with Wix Business",
+          "tier": "mixed"
+        }
+      ]
+    },
+    "Payments": {
+      "icon": "\ud83d\udcb3",
+      "services": [
+        {
+          "id": "metronome/sandbox",
+          "name": "Metronome",
+          "desc": "Usage-based billing platform sandbox",
+          "tier": "free"
+        }
+      ]
+    }
+  },
+  "templates": {
+    "saas-mvp": {
+      "name": "\ud83d\ude80 SaaS MVP",
+      "desc": "Web app with database, auth, and hosting",
+      "services": [
+        "neon/postgres",
+        "clerk/auth",
+        "vercel/project",
+        "posthog/analytics"
+      ]
+    },
+    "ai-agent": {
+      "name": "\ud83e\udd16 AI Agent Stack",
+      "desc": "Agent with memory, tools, and deployment",
+      "services": [
+        "openrouter/api",
+        "supermemory/memory",
+        "firecrawl/api",
+        "railway/hosting",
+        "upstash/redis"
+      ]
+    },
+    "ecommerce": {
+      "name": "\ud83d\uded2 E-Commerce",
+      "desc": "Online store with payments and analytics",
+      "services": [
+        "wix/headless",
+        "supabase/project",
+        "clerk/auth",
+        "algolia/application",
+        "amplitude/analytics"
+      ]
+    },
+    "content-site": {
+      "name": "\ud83d\udcdd Content Site",
+      "desc": "Blog or docs site with search and analytics",
+      "services": [
+        "netlify/project",
+        "turso/database",
+        "upstash/search",
+        "mixpanel/analytics"
+      ]
+    },
+    "api-backend": {
+      "name": "\u26a1 API Backend",
+      "desc": "Serverless API with queue and monitoring",
+      "services": [
+        "cloudflare/workers",
+        "cloudflare/d1",
+        "cloudflare/queues",
+        "sentry/project",
+        "upstash/redis"
+      ]
+    }
+  }
+}
