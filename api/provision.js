@@ -49,7 +49,7 @@ export default async function handler(req, res) {
 
   const { providers } = req.body;
   if (!Array.isArray(providers) || providers.length === 0) {
-    return res.status(400).json({ error: 'En az bir servis seçmelisin.' });
+    return res.status(400).json({ error: 'Select at least one service.' });
   }
 
   const results = [];
@@ -59,7 +59,7 @@ export default async function handler(req, res) {
   for (const provider of providers) {
     const svc = DEMO_KEYS[provider];
     if (!svc) {
-      errors.push({ provider, error: 'Bilinmeyen servis' });
+      errors.push({ provider, error: 'Unknown service' });
       continue;
     }
 
@@ -92,7 +92,7 @@ export default async function handler(req, res) {
     env: envContent,
     mode: DEMO_MODE ? 'demo' : 'live',
     message: DEMO_MODE
-      ? `🎭 Demo mod: ${results.length} servis simüle edildi. Gerçek kullanımda Stripe Projects ile provision edilir.`
-      : `${results.length} servis başarıyla kuruldu!`,
+      ? `🎭 Demo mode: ${results.length} service(s) simulated. Real usage provisions via Stripe Projects.`
+      : `${results.length} service(s) provisioned successfully!`,
   });
 }

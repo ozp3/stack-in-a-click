@@ -167,25 +167,25 @@
   <div class="header">
     <div class="badge">Hermes Agent + Stripe Projects</div>
     <h1>Stack-<span>in-a-Click</span></h1>
-    <p>Tek tıkla SaaS altyapını kur, .env olarak teslim al.</p>
+    <p>Provision your SaaS stack with one click. Select services, get your .env.</p>
   </div>
 
   <div class="card" id="services-card">
-    <h3>🛠️ Hangi servislere ihtiyacın var?</h3>
+    <h3>🛠️ Which services do you need?</h3>
     <div class="service-list" id="service-list">
       <!-- filled by JS -->
     </div>
     <button class="btn" id="provision-btn" onclick="provision()">
-      🚀 Provision Seçili Servisler
+      🚀 Provision Selected Services
     </button>
     <div class="status" id="status"></div>
   </div>
 
   <div class="card" id="results-card" style="display:none">
-    <h3>📦 Sonuç</h3>
+    <h3>📦 Result</h3>
     <div class="result-list" id="result-list"></div>
     <div class="env-output" id="env-output"></div>
-    <button class="copy-btn" id="copy-btn" style="display:none" onclick="copyEnv()">📋 .env'i Kopyala</button>
+    <button class="copy-btn" id="copy-btn" style="display:none" onclick="copyEnv()">📋 Copy .env</button>
   </div>
 
   <div class="footer">
@@ -209,7 +209,7 @@ async function loadServices() {
     renderServices();
   } catch (e) {
     document.getElementById('service-list').innerHTML =
-      '<div style="color:#ff4d4d">Servisler yüklenemedi: API çalışmıyor olabilir.</div>';
+      '<div style="color:#ff4d4d">Failed to load services. API may be down.</div>';
   }
 }
 
@@ -222,7 +222,7 @@ function renderServices() {
         <div class="name">${svc.name}</div>
         <div class="desc">${svc.desc}</div>
       </div>
-      <div class="tier ${svc.tier}">${svc.tier === 'free' ? 'Ücretsiz' : 'Kullandıkça'}</div>
+      <div class="tier ${svc.tier}">${svc.tier === 'free' ? 'Free' : 'Pay-as-you-go'}</div>
     </div>
   `).join('');
 }
@@ -238,7 +238,7 @@ function getSelected() {
 async function provision() {
   const selected = getSelected();
   if (selected.length === 0) {
-    showStatus('En az bir servis seçmelisin!', 'error');
+    showStatus('Select at least one service!', 'error');
     return;
   }
 
@@ -246,7 +246,7 @@ async function provision() {
   const status = document.getElementById('status');
 
   btn.disabled = true;
-  showStatus('<span class="spinner"></span>Servisler kuruluyor, Stripe üzerinden provision ediliyor...', 'loading');
+  showStatus('<span class="spinner"></span>Provisioning via Stripe Projects...', 'loading');
 
   try {
     const res = await fetch(`${API}/api/provision`, {
@@ -274,14 +274,14 @@ async function provision() {
     if (data.env && data.env.trim()) {
       envDiv.textContent = data.env;
       copyBtn.style.display = 'inline-block';
-      copyBtn.textContent = '📋 .env\'i Kopyala';
+      copyBtn.textContent = '📋 Copy .env';
     }
 
     showStatus(data.message, data.success ? 'success' : 'error');
     document.querySelectorAll('.service.selected').forEach(el => el.classList.remove('selected'));
 
   } catch (e) {
-    showStatus('Bağlantı hatası: ' + e.message, 'error');
+    showStatus('Connection error: ' + e.message, 'error');
   } finally {
     btn.disabled = false;
   }
@@ -296,7 +296,7 @@ function showStatus(msg, type) {
 function copyEnv() {
   const env = document.getElementById('env-output').textContent;
   navigator.clipboard.writeText(env).then(() => {
-    showStatus('✅ .env panoya kopyalandı!', 'success');
+    showStatus('✅ .env copied to clipboard!', 'success');
   });
 }
 
