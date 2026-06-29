@@ -242,9 +242,16 @@ function renderTemplates() {
 }
 
 function loadTemplate(id) {
-  activeTemplate = id; selected.clear();
-  catalog.templates[id].services.forEach(s => selected.add(s));
-  document.querySelectorAll('.tpl-card').forEach(c => c.classList.toggle('active', c.dataset.tpl === id));
+  if (activeTemplate === id) {
+    // Toggle off: deselect all services from this template
+    activeTemplate = null;
+    catalog.templates[id].services.forEach(s => selected.delete(s));
+    document.querySelectorAll('.tpl-card').forEach(c => c.classList.remove('active'));
+  } else {
+    activeTemplate = id; selected.clear();
+    catalog.templates[id].services.forEach(s => selected.add(s));
+    document.querySelectorAll('.tpl-card').forEach(c => c.classList.toggle('active', c.dataset.tpl === id));
+  }
   updateAll();
 }
 
